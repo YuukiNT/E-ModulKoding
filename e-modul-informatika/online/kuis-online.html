@@ -11,6 +11,7 @@
 <div class="on-topbar">
   <div class="brand">🎓 Kuis Online · Koding &amp; AI Bab 2</div>
   <div class="who">
+    <a href="kumpul-tugas.html" style="color:#fff; opacity:.9; font-size:13px; margin-right:4px;">📤 Kumpul Tugas</a>
     <span id="whoText">Memuat...</span>
     <button id="btnLogout">Keluar</button>
   </div>
@@ -65,9 +66,11 @@
   } from "./js/firebase-init.js";
 
   const PERTEMUAN_LIST = [
-    { id:'p1', title:'Pertemuan 1', sub:'Struktur Logika Kompleks' },
-    { id:'p2', title:'Pertemuan 2', sub:'Kasir Cerdas & Strategi Algoritma' },
-    { id:'p3', title:'Pertemuan 3', sub:'Pengenalan Debugging' },
+    { id:'pretest', title:'Pretest', sub:'Sebelum mulai belajar Bab 2', type:'test' },
+    { id:'p1', title:'Pertemuan 1', sub:'Struktur Logika Kompleks', type:'materi' },
+    { id:'p2', title:'Pertemuan 2', sub:'Kasir Cerdas & Strategi Algoritma', type:'materi' },
+    { id:'p3', title:'Pertemuan 3', sub:'Pengenalan Debugging', type:'materi' },
+    { id:'posttest', title:'Posttest', sub:'Setelah selesai semua materi Bab 2', type:'test' },
   ];
 
   let currentStudent = null; // { nisn, nama, kelas }
@@ -81,24 +84,37 @@
     t._timer = setTimeout(()=>t.classList.remove('show'), 2200);
   }
 
+  function friendlyError(err){
+    console.error(err);
+    if(err.code === 'permission-denied' || (err.message && err.message.includes('permission'))){
+      return '⛔ Akses ditolak sistem. Coba logout lalu login lagi. Kalau masih gagal, minta guru cek Firestore Rules.';
+    }
+    if(err.code === 'unavailable') return '⚠️ Tidak bisa terhubung ke server. Cek koneksi internetmu.';
+    return '⚠️ Terjadi kesalahan: ' + (err.message || err);
+  }
+
   onAuthStateChanged(auth, async (user) => {
     if(!user || !user.email || !user.email.endsWith('@' + STUDENT_EMAIL_DOMAIN)){
       window.location.href = 'login.html';
       return;
     }
     const nisn = user.email.replace('@' + STUDENT_EMAIL_DOMAIN, '');
-    const studentDoc = await getDoc(doc(db, 'students', nisn));
-    if(!studentDoc.exists()){
-      showToast('Data siswa tidak ditemukan. Hubungi guru.');
-      return;
-    }
-    currentStudent = { nisn, ...studentDoc.data() };
-    document.getElementById('whoText').textContent = currentStudent.nama + ' · ' + (currentStudent.kelas || '');
-    document.getElementById('namaSiswa').textContent = currentStudent.nama;
+    try{
+      const studentDoc = await getDoc(doc(db, 'students', nisn));
+      if(!studentDoc.exists()){
+        showToast('Data siswa tidak ditemukan. Hubungi guru.');
+        return;
+      }
+      currentStudent = { nisn, ...studentDoc.data() };
+      document.getElementById('whoText').textContent = currentStudent.nama + ' · ' + (currentStudent.kelas || '');
+      document.getElementById('namaSiswa').textContent = currentStudent.nama;
 
-    await loadPertemuanStatus();
-    await loadScores();
-    renderDashboard();
+      await loadPertemuanStatus();
+      await loadScores();
+      renderDashboard();
+    }catch(err){
+      showToast(friendlyError(err));
+    }
   });
 
   document.getElementById('btnLogout').addEventListener('click', async () => {
@@ -110,7 +126,7 @@
   async function loadPertemuanStatus(){
     for(const p of PERTEMUAN_LIST){
       const snap = await getDoc(doc(db, 'pertemuanStatus', p.id));
-      currentPertemuanStatus[p.id] = snap.exists() ? snap.data() : { unlocked: p.id === 'p1' };
+      currentPertemuanStatus[p.id] = snap.exists() ? snap.data() : { unlocked: p.id === 'pretest' };
     }
   }
 
@@ -131,19 +147,25 @@
       const unlocked = currentPertemuanStatus[p.id]?.unlocked;
       const score = currentScores[p.id];
       const card = document.createElement('div');
-      card.className = 'pert-card';
+      card.className = 'pert-card' + (p.type === 'test' ? ' pert-card-test' : '');
       let statusHtml, actionHtml;
       if(!unlocked){
         statusHtml = '<div class="status locked">🔒 Terkunci</div>';
-        actionHtml = '<p style="margin-top:14px;">Menunggu gurumu membuka pertemuan ini.</p>';
+        actionHtml = '<p style="margin-top:14px;">Menunggu gurumu membuka ini.</p>';
       } else if(score){
         statusHtml = '<div class="status done">✅ Sudah Dikerjakan</div>';
-        actionHtml = `<div class="score">${score.persen}</div><p>${score.benar}/${score.total} benar</p><button class="on-btn secondary sm" data-start="${p.id}">Kerjakan Lagi</button>`;
+        if(p.type === 'test'){
+          // Pretest/Posttest hanya boleh 1 kali supaya data N-gain valid.
+          actionHtml = `<div class="score">${score.persen}</div><p>${score.benar}/${score.total} benar — tidak bisa diulang</p>`;
+        } else {
+          actionHtml = `<div class="score">${score.persen}</div><p>${score.benar}/${score.total} benar</p><button class="on-btn secondary sm" data-start="${p.id}">Kerjakan Lagi</button>`;
+        }
       } else {
         statusHtml = '<div class="status unlocked">🟢 Terbuka</div>';
         actionHtml = '<button class="on-btn sm" data-start="' + p.id + '" style="width:auto; padding:10px 20px; margin-top:10px;">Mulai Kuis</button>';
       }
-      card.innerHTML = `${statusHtml}<h3>${p.title}</h3><p style="margin-top:-4px;">${p.sub}</p>${actionHtml}`;
+      const badge = p.type === 'test' ? '<span class="test-badge">TES</span>' : '';
+      card.innerHTML = `${statusHtml}<h3>${badge}${p.title}</h3><p style="margin-top:-4px;">${p.sub}</p>${actionHtml}`;
       grid.appendChild(card);
     });
     grid.querySelectorAll('[data-start]').forEach(btn => {
@@ -162,11 +184,22 @@
 
   async function startQuiz(pertemuanId){
     if(!currentPertemuanStatus[pertemuanId]?.unlocked){
-      showToast('Pertemuan ini masih terkunci.');
+      showToast('Ini masih terkunci.');
       return;
     }
-    const q = query(collection(db, 'questions'), where('pertemuan', '==', pertemuanId), orderBy('urutan'));
-    const snaps = await getDocs(q);
+    const itemInfo = PERTEMUAN_LIST.find(p => p.id === pertemuanId);
+    if(itemInfo?.type === 'test' && currentScores[pertemuanId]){
+      showToast('Pretest/Posttest hanya bisa dikerjakan satu kali.');
+      return;
+    }
+    let snaps;
+    try{
+      const q = query(collection(db, 'questions'), where('pertemuan', '==', pertemuanId), orderBy('urutan'));
+      snaps = await getDocs(q);
+    }catch(err){
+      showToast(friendlyError(err));
+      return;
+    }
     quizQuestions = [];
     snaps.forEach(s => quizQuestions.push({ id: s.id, ...s.data() }));
 
@@ -217,22 +250,29 @@
     const total = quizQuestions.length;
     const persen = Math.round((benar/total)*100);
 
-    const scoreId = currentStudent.nisn + '_' + quizPertemuan.id;
-    await setDoc(doc(db, 'scores', scoreId), {
-      nisn: currentStudent.nisn,
-      nama: currentStudent.nama,
-      kelas: currentStudent.kelas || '',
-      pertemuan: quizPertemuan.id,
-      benar, total, persen,
-      waktu: serverTimestamp()
-    });
-    currentScores[quizPertemuan.id] = { benar, total, persen };
+    const btn = document.getElementById('btnQFinish');
+    btn.disabled = true; btn.textContent = 'Mengirim...';
+    try{
+      const scoreId = currentStudent.nisn + '_' + quizPertemuan.id;
+      await setDoc(doc(db, 'scores', scoreId), {
+        nisn: currentStudent.nisn,
+        nama: currentStudent.nama,
+        kelas: currentStudent.kelas || '',
+        pertemuan: quizPertemuan.id,
+        benar, total, persen,
+        waktu: serverTimestamp()
+      });
+      currentScores[quizPertemuan.id] = { benar, total, persen };
 
-    document.getElementById('quizView').style.display = 'none';
-    document.getElementById('resultView').style.display = 'block';
-    document.getElementById('resultEmoji').textContent = persen >= 75 ? '🎉' : '💪';
-    document.getElementById('resultTitle').textContent = 'Nilai: ' + persen;
-    document.getElementById('resultDetail').textContent = `Benar ${benar} dari ${total} soal — ${quizPertemuan.title}`;
+      document.getElementById('quizView').style.display = 'none';
+      document.getElementById('resultView').style.display = 'block';
+      document.getElementById('resultEmoji').textContent = persen >= 75 ? '🎉' : '💪';
+      document.getElementById('resultTitle').textContent = 'Nilai: ' + persen;
+      document.getElementById('resultDetail').textContent = `Benar ${benar} dari ${total} soal — ${quizPertemuan.title}`;
+    }catch(err){
+      showToast(friendlyError(err));
+    }
+    btn.disabled = false; btn.textContent = 'Kumpulkan Jawaban';
   });
 </script>
 </body>

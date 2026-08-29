@@ -35,7 +35,7 @@
 </div>
 
 <script type="module">
-  import { auth, signInWithEmailAndPassword, STUDENT_EMAIL_DOMAIN } from "./js/firebase-init.js";
+  import { auth, signInWithEmailAndPassword, STUDENT_EMAIL_DOMAIN, persistenceReady } from "./js/firebase-init.js";
 
   const form = document.getElementById('loginForm');
   const errorBox = document.getElementById('loginError');
@@ -58,6 +58,7 @@
 
     const email = nisn + '@' + STUDENT_EMAIL_DOMAIN;
     try{
+      await persistenceReady;
       await signInWithEmailAndPassword(auth, email, password);
       sessionStorage.setItem('emodul_student_nisn', nisn);
       window.location.href = 'kuis-online.html';

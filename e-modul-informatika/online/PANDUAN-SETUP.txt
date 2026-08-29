@@ -37,6 +37,13 @@ atau membuka pertemuan (akan ditolak oleh aturan keamanan).
 
 LANGKAH 3 — Pasang Aturan Keamanan Firestore
 ------------------------------------
+⚠️ PENTING kalau kamu sebelumnya sudah pernah menempel Rules versi
+lama: buka lagi Firebase Console > Firestore Database > tab "Rules",
+HAPUS SEMUA isinya, lalu tempel ulang versi TERBARU di bawah ini
+(sudah termasuk aturan untuk fitur Kumpul Tugas Koding), klik
+"Publish" lagi. Kalau tidak diulang, fitur Kumpul Tugas akan gagal
+dengan pesan "Akses ditolak sistem".
+
 Buka Firebase Console > Firestore Database > tab "Rules", hapus
 semua isinya, lalu tempel aturan di bawah ini, klik "Publish":
 
@@ -80,9 +87,31 @@ service cloud.firestore {
         (isLoggedIn() && request.resource.data.nisn + '@siswa.emodul.local' == request.auth.token.email);
       allow delete: if isAdmin();
     }
+
+    match /submissions/{id} {
+      allow read: if isAdmin() || isLoggedIn();
+      allow create: if isAdmin() || (
+        isLoggedIn() &&
+        request.resource.data.nisn + '@siswa.emodul.local' == request.auth.token.email &&
+        request.resource.data.dinilai == false
+      );
+      allow update: if isAdmin() || (
+        isLoggedIn() &&
+        request.resource.data.nisn + '@siswa.emodul.local' == request.auth.token.email &&
+        request.resource.data.nilai == resource.data.nilai &&
+        request.resource.data.catatanGuru == resource.data.catatanGuru &&
+        request.resource.data.dinilai == resource.data.dinilai
+      );
+      allow delete: if isAdmin();
+    }
   }
 }
 --------------------------------------------------------------
+
+Aturan "submissions" di atas sengaja dibuat supaya siswa BOLEH kirim/
+ubah kode tugasnya sendiri, tapi TIDAK BISA mengubah nilai/catatan
+yang sudah diisi guru (field nilai, catatanGuru, dinilai hanya bisa
+diubah lewat akun admin).
 
 Kenapa ini penting: karena aturan versi awal (kalau hanya menebak
 "bukan email siswa = admin") bisa dibobol siapa saja yang tahu cara
@@ -103,14 +132,29 @@ LANGKAH 5 — Alur Pemakaian
 1. Kamu (admin) buka online/admin.html, login pakai akun admin.
 2. Tambahkan siswa satu per satu di tab "Siswa" (NISN, nama, kelas,
    password awal).
-3. Tambahkan soal di tab "Soal", pilih pertemuan mana soal itu untuk.
-4. Di tab "Pertemuan", buka (unlock) Pertemuan 1 dulu, sisanya biarkan
-   terkunci.
-5. Siswa buka online/login.html, login pakai NISN + password yang
-   kamu buatkan.
-6. Setelah siswa selesai Pertemuan 1, kamu buka tab "Nilai" untuk
-   cek hasilnya, baru kamu unlock Pertemuan 2 lewat tab "Pertemuan".
-7. Ulangi untuk Pertemuan 3.
+3. Tambahkan soal di tab "Soal" — pilih Pretest, Pertemuan 1/2/3, atau
+   Posttest, lalu isi satu per satu ATAU import sekaligus dari Excel
+   (unduh template dulu di tab yang sama).
+4. Di tab "Pertemuan", buka (unlock) "Pretest" dulu — biarkan yang
+   lain terkunci. Minta siswa kerjakan Pretest sebelum mulai belajar
+   materi Bab 2 (materi dipelajari lewat e-modul offline seperti
+   biasa, tidak lewat sistem online ini).
+5. Setelah siswa selesai Pretest, tutup lagi Pretest, lalu buka
+   Pertemuan 1 sesuai jadwal kelas.
+6. Ulangi pola buka-tutup untuk Pertemuan 2 dan 3.
+7. Setelah semua materi selesai, buka "Posttest".
+8. Cek tab "Nilai" → bagian "Rekap N-Gain" untuk melihat peningkatan
+   nilai tiap siswa (Pretest → Posttest) secara otomatis, lengkap
+   dengan kategori Tinggi/Sedang/Rendah dan rata-rata kelas — bisa
+   langsung diunduh sebagai CSV untuk dilampirkan di skripsi.
+
+CATATAN PRETEST/POSTTEST
+------------------------------------
+- Pretest dan Posttest hanya bisa dikerjakan SATU KALI per siswa
+  (tombol "Kerjakan Lagi" tidak muncul), supaya datanya valid untuk
+  perhitungan N-Gain.
+- Kuis Pertemuan 1/2/3 tetap boleh dikerjakan berkali-kali (sifatnya
+  latihan, bukan alat ukur penelitian).
 
 
 CATATAN

@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Panel Admin · Kuis Online Bab 2</title>
 <link rel="stylesheet" href="css/online.css">
+<link rel="stylesheet" href="css/compiler-online.css">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="../assets/js/skulpt/skulpt.min.js"></script>
+<script src="../assets/js/skulpt/skulpt-stdlib.js"></script>
 </head>
 <body>
 
@@ -43,6 +47,7 @@
     <div class="admin-tabs">
       <button class="active" data-tab="pertemuan">📅 Pertemuan</button>
       <button data-tab="soal">📝 Soal</button>
+      <button data-tab="tugas">📤 Tugas Koding</button>
       <button data-tab="siswa">🧑‍🎓 Siswa</button>
       <button data-tab="nilai">📊 Nilai</button>
     </div>
@@ -59,13 +64,38 @@
     <!-- TAB: SOAL -->
     <div class="admin-panel" id="tabSoal">
       <div class="on-panel-card">
-        <h3>Tambah Soal Baru</h3>
+        <h3>📥 Import Soal dari Excel</h3>
+        <p style="color:var(--on-ink-soft); font-size:13.5px; margin-top:-8px;">Cocok untuk memasukkan banyak soal sekaligus. Unduh template dulu supaya formatnya pas, isi di Excel, lalu upload lagi di sini.</p>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;">
+          <button class="on-btn secondary sm" id="btnDownloadTemplate" style="width:auto;">⬇ Unduh Template Excel</button>
+          <label class="on-btn sm" style="width:auto; cursor:pointer;">
+            📤 Pilih File Excel
+            <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display:none;">
+          </label>
+        </div>
+
+        <div id="importPreviewWrap" style="display:none;">
+          <p style="font-size:13.5px; font-weight:600; margin-bottom:8px;" id="importSummaryText"></p>
+          <table class="on-table">
+            <thead><tr><th>Baris</th><th>Pertemuan</th><th>Pertanyaan</th><th>Jawaban Benar</th><th>Status</th></tr></thead>
+            <tbody id="importPreviewBody"></tbody>
+          </table>
+          <button class="on-btn accent" id="btnConfirmImport" style="width:auto; padding:11px 22px; margin-top:14px;">✅ Import Soal yang Valid</button>
+          <button class="on-btn secondary" id="btnCancelImport" style="width:auto; padding:11px 22px; margin-top:14px;">Batal</button>
+        </div>
+      </div>
+
+      <div class="on-panel-card">
+        <h3>Tambah Soal Baru (Satu per Satu)</h3>
         <div class="on-field">
           <label>Pertemuan</label>
           <select id="soalPertemuan">
+            <option value="pretest">Pretest (sebelum belajar)</option>
             <option value="p1">Pertemuan 1 — Struktur Logika Kompleks</option>
             <option value="p2">Pertemuan 2 — Kasir Cerdas & Strategi Algoritma</option>
             <option value="p3">Pertemuan 3 — Pengenalan Debugging</option>
+            <option value="posttest">Posttest (setelah selesai belajar)</option>
           </select>
         </div>
         <div class="on-field">
@@ -90,15 +120,61 @@
         <div class="on-field" style="max-width:280px;">
           <label>Filter Pertemuan</label>
           <select id="filterSoalPertemuan">
+            <option value="pretest">Pretest</option>
             <option value="p1">Pertemuan 1</option>
             <option value="p2">Pertemuan 2</option>
             <option value="p3">Pertemuan 3</option>
+            <option value="posttest">Posttest</option>
           </select>
         </div>
         <table class="on-table">
           <thead><tr><th>#</th><th>Pertanyaan</th><th>Jawaban Benar</th><th></th></tr></thead>
           <tbody id="soalTableBody"></tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- TAB: TUGAS KODING -->
+    <div class="admin-panel" id="tabTugas">
+      <div class="on-panel-card">
+        <h3>Kumpulan Tugas Koding Siswa</h3>
+        <div class="on-field" style="max-width:320px;">
+          <label>Filter Tugas</label>
+          <select id="filterTugas">
+            <option value="tantangan1">Tantangan 1 — Konversi Suhu (P1)</option>
+            <option value="tantangan2">Tantangan 2 — Kasir Cerdas + FIFO (P2)</option>
+            <option value="tantangan3">Tantangan 3 — Try-Except (P3)</option>
+          </select>
+        </div>
+        <table class="on-table">
+          <thead><tr><th>NISN</th><th>Nama</th><th>Kelas</th><th>Status</th><th></th></tr></thead>
+          <tbody id="tugasTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="on-panel-card" id="lihatTugasCard" style="display:none;">
+        <h3 id="lihatTugasJudul">Lihat & Nilai Tugas</h3>
+        <div class="lab-grid">
+          <div class="lab-panel">
+            <div class="panel-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>&nbsp;kode-siswa.py</div>
+            <div class="editor-wrap"><pre class="code-view" id="lihatKodeSiswa" style="margin:0; overflow:auto;"></pre></div>
+          </div>
+          <div class="lab-panel">
+            <div class="panel-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>&nbsp;output</div>
+            <div class="output-area" id="adminOutputArea"><span class="out-empty">Klik "Jalankan" untuk menguji kode ini.</span></div>
+            <div class="lab-actions"><button class="on-btn accent" id="btnRunSubmission" style="width:auto;">▶ Jalankan</button></div>
+          </div>
+        </div>
+        <div class="on-field" style="max-width:160px;">
+          <label>Nilai (0-100)</label>
+          <input type="number" id="nilaiTugasInput" min="0" max="100">
+        </div>
+        <div class="on-field">
+          <label>Catatan untuk Siswa</label>
+          <textarea id="catatanTugasInput" rows="2" placeholder="Opsional, misal: kurang efisien di bagian pengulangan"></textarea>
+        </div>
+        <button class="on-btn accent" id="btnSimpanNilaiTugas" style="width:auto; padding:11px 22px;">💾 Simpan Penilaian</button>
+        <button class="on-btn secondary" id="btnTutupLihatTugas" style="width:auto; padding:11px 22px;">Tutup</button>
       </div>
     </div>
 
@@ -145,9 +221,11 @@
           <label>Filter Pertemuan</label>
           <select id="filterNilaiPertemuan">
             <option value="semua">Semua Pertemuan</option>
+            <option value="pretest">Pretest</option>
             <option value="p1">Pertemuan 1</option>
             <option value="p2">Pertemuan 2</option>
             <option value="p3">Pertemuan 3</option>
+            <option value="posttest">Posttest</option>
           </select>
         </div>
         <button class="on-btn secondary sm" id="btnExportCsv" style="width:auto; margin-bottom:14px;">⬇ Unduh sebagai CSV</button>
@@ -155,6 +233,17 @@
           <thead><tr><th>NISN</th><th>Nama</th><th>Kelas</th><th>Pertemuan</th><th>Benar</th><th>Nilai</th></tr></thead>
           <tbody id="nilaiTableBody"></tbody>
         </table>
+      </div>
+
+      <div class="on-panel-card">
+        <h3>📈 Rekap N-Gain (Pretest → Posttest)</h3>
+        <p style="color:var(--on-ink-soft); font-size:13.5px; margin-top:-8px;">Dihitung otomatis dari nilai Pretest dan Posttest tiap siswa. Rumus: (Posttest − Pretest) / (100 − Pretest).</p>
+        <button class="on-btn secondary sm" id="btnExportNgainCsv" style="width:auto; margin-bottom:14px;">⬇ Unduh Rekap N-Gain (CSV)</button>
+        <table class="on-table">
+          <thead><tr><th>NISN</th><th>Nama</th><th>Kelas</th><th>Pretest</th><th>Posttest</th><th>N-Gain</th><th>Kategori</th></tr></thead>
+          <tbody id="ngainTableBody"></tbody>
+        </table>
+        <div id="ngainSummary" style="margin-top:14px; font-size:13.5px; color:var(--on-ink-soft);"></div>
       </div>
     </div>
   </div>
@@ -165,7 +254,7 @@
 <script type="module">
   import {
     auth, db, secondaryAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut,
-    createUserWithEmailAndPassword, STUDENT_EMAIL_DOMAIN,
+    createUserWithEmailAndPassword, STUDENT_EMAIL_DOMAIN, persistenceReady,
     collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, query, where, orderBy
   } from "./js/firebase-init.js";
 
@@ -173,13 +262,24 @@
     const t = document.getElementById('toastOn');
     t.textContent = msg; t.classList.add('show');
     clearTimeout(t._timer);
-    t._timer = setTimeout(()=>t.classList.remove('show'), 2200);
+    t._timer = setTimeout(()=>t.classList.remove('show'), 3200);
+  }
+
+  function friendlyError(err){
+    console.error(err);
+    if(err.code === 'permission-denied' || (err.message && err.message.includes('permission'))){
+      return '⛔ Ditolak sistem: akun ini belum terdaftar sebagai admin di Firestore (cek Langkah 2 di PANDUAN-SETUP.txt), atau Rules belum ditempel (Langkah 3).';
+    }
+    if(err.code === 'unavailable') return '⚠️ Tidak bisa terhubung ke server. Cek koneksi internet.';
+    return '⚠️ Terjadi kesalahan: ' + (err.message || err);
   }
 
   const PERTEMUAN_LIST = [
+    { id:'pretest', title:'Pretest (sebelum belajar)' },
     { id:'p1', title:'Pertemuan 1 — Struktur Logika Kompleks' },
     { id:'p2', title:'Pertemuan 2 — Kasir Cerdas & Strategi Algoritma' },
     { id:'p3', title:'Pertemuan 3 — Pengenalan Debugging' },
+    { id:'posttest', title:'Posttest (setelah selesai belajar)' },
   ];
 
   /* ===== LOGIN ADMIN ===== */
@@ -192,6 +292,7 @@
     const btn = document.getElementById('btnAdminLogin');
     btn.disabled = true; btn.textContent = 'Memeriksa...';
     try{
+      await persistenceReady;
       await signInWithEmailAndPassword(auth, email, password);
     }catch(err){
       errBox.textContent = 'Email atau password salah.';
@@ -233,36 +334,169 @@
     renderSoalTable();
     renderSiswaTable();
     renderNilaiTable();
+    renderNgainTable();
+    renderTugasTable();
     document.getElementById('filterSoalPertemuan').addEventListener('change', renderSoalTable);
     document.getElementById('filterNilaiPertemuan').addEventListener('change', renderNilaiTable);
+    document.getElementById('filterTugas').addEventListener('change', renderTugasTable);
   }
 
   /* ===== TAB PERTEMUAN ===== */
   async function renderPertemuanToggles(){
     const wrap = document.getElementById('pertemuanToggleList');
     wrap.innerHTML = '';
-    for(const p of PERTEMUAN_LIST){
-      const snap = await getDoc(doc(db, 'pertemuanStatus', p.id));
-      const unlocked = snap.exists() ? snap.data().unlocked : (p.id === 'p1');
-      const row = document.createElement('div');
-      row.className = 'pertemuan-toggle-row';
-      row.innerHTML = `
-        <div><strong>${p.title}</strong></div>
-        <label class="switch">
-          <input type="checkbox" data-pertemuan="${p.id}" ${unlocked ? 'checked' : ''}>
-          <span class="slider"></span>
-        </label>`;
-      wrap.appendChild(row);
+    try{
+      for(const p of PERTEMUAN_LIST){
+        const snap = await getDoc(doc(db, 'pertemuanStatus', p.id));
+        const unlocked = snap.exists() ? snap.data().unlocked : (p.id === 'pretest');
+        const isTest = p.id === 'pretest' || p.id === 'posttest';
+        const row = document.createElement('div');
+        row.className = 'pertemuan-toggle-row';
+        row.innerHTML = `
+          <div>${isTest ? '<span class="test-badge">TES</span>' : ''}<strong>${p.title}</strong></div>
+          <label class="switch">
+            <input type="checkbox" data-pertemuan="${p.id}" ${unlocked ? 'checked' : ''}>
+            <span class="slider"></span>
+          </label>`;
+        wrap.appendChild(row);
+      }
+    }catch(err){
+      showToast(friendlyError(err));
+      return;
     }
     wrap.querySelectorAll('input[type="checkbox"]').forEach(cb => {
       cb.addEventListener('change', async () => {
-        await setDoc(doc(db, 'pertemuanStatus', cb.dataset.pertemuan), { unlocked: cb.checked }, { merge: true });
-        showToast((cb.checked ? 'Dibuka: ' : 'Ditutup: ') + PERTEMUAN_LIST.find(p=>p.id===cb.dataset.pertemuan).title);
+        try{
+          await setDoc(doc(db, 'pertemuanStatus', cb.dataset.pertemuan), { unlocked: cb.checked }, { merge: true });
+          showToast((cb.checked ? '🟢 Dibuka: ' : '🔒 Ditutup: ') + PERTEMUAN_LIST.find(p=>p.id===cb.dataset.pertemuan).title);
+        }catch(err){
+          cb.checked = !cb.checked; // batalkan tampilan toggle karena gagal disimpan
+          showToast(friendlyError(err));
+        }
       });
     });
   }
 
-  /* ===== TAB SOAL ===== */
+  /* ===== IMPORT EXCEL ===== */
+  const PERTEMUAN_LABEL = { pretest:'Pretest', p1:'Pertemuan 1', p2:'Pertemuan 2', p3:'Pertemuan 3', posttest:'Posttest' };
+
+  document.getElementById('btnDownloadTemplate').addEventListener('click', () => {
+    const headers = ['Pertemuan (pretest/p1/p2/p3/posttest)', 'Pertanyaan', 'Opsi A', 'Opsi B', 'Opsi C', 'Opsi D', 'Jawaban Benar (A/B/C/D)'];
+    const contoh = [
+      'p1', 'Percabangan di dalam percabangan lain disebut...', 'Nested if', 'Nested loop', 'Comparison chaining', 'Modular function', 'A'
+    ];
+    const contoh2 = [
+      'p2', 'Prinsip antrean FIFO artinya...', 'Terakhir masuk, pertama keluar', 'Pertama masuk, pertama keluar', 'Acak', '', 'B'
+    ];
+    const ws = XLSX.utils.aoa_to_sheet([headers, contoh, contoh2]);
+    ws['!cols'] = [{wch:20},{wch:40},{wch:20},{wch:20},{wch:20},{wch:20},{wch:22}];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Soal');
+    XLSX.writeFile(wb, 'template-soal-koding-ai.xlsx');
+  });
+
+  let parsedImportRows = [];
+
+  document.getElementById('excelFileInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const data = new Uint8Array(evt.target.result);
+      const wb = XLSX.read(data, { type: 'array' });
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+
+      parsedImportRows = [];
+      for(let i = 1; i < rows.length; i++){ // lewati baris header (index 0)
+        const r = rows[i];
+        if(!r || r.every(c => String(c).trim() === '')) continue; // lewati baris kosong
+
+        const pertemuanRaw = String(r[0] || '').trim().toLowerCase();
+        const pertanyaan = String(r[1] || '').trim();
+        const opsi = [r[2], r[3], r[4], r[5]].map(v => String(v || '').trim()).filter(v => v.length > 0);
+        const jawabanRaw = String(r[6] || '').trim().toUpperCase();
+        const jawabanIdx = { 'A':0, 'B':1, 'C':2, 'D':3 }[jawabanRaw];
+
+        let status = 'valid';
+        let alasan = '';
+        if(!['pretest','p1','p2','p3','posttest'].includes(pertemuanRaw)){ status = 'invalid'; alasan = 'Pertemuan harus pretest/p1/p2/p3/posttest'; }
+        else if(!pertanyaan){ status = 'invalid'; alasan = 'Pertanyaan kosong'; }
+        else if(opsi.length < 2){ status = 'invalid'; alasan = 'Minimal 2 pilihan jawaban'; }
+        else if(jawabanIdx === undefined || jawabanIdx >= opsi.length){ status = 'invalid'; alasan = 'Jawaban benar tidak valid'; }
+
+        parsedImportRows.push({
+          baris: i+1, pertemuan: pertemuanRaw, pertanyaan, opsi, jawabanBenar: jawabanIdx, status, alasan
+        });
+      }
+      renderImportPreview();
+    };
+    reader.readAsArrayBuffer(file);
+  });
+
+  function renderImportPreview(){
+    const wrap = document.getElementById('importPreviewWrap');
+    const tbody = document.getElementById('importPreviewBody');
+    const validCount = parsedImportRows.filter(r => r.status === 'valid').length;
+    document.getElementById('importSummaryText').textContent =
+      `Ditemukan ${parsedImportRows.length} baris soal — ${validCount} valid, ${parsedImportRows.length - validCount} bermasalah (tidak akan diimpor).`;
+
+    tbody.innerHTML = parsedImportRows.map(r => `
+      <tr>
+        <td>${r.baris}</td>
+        <td>${r.status === 'valid' ? (PERTEMUAN_LABEL[r.pertemuan] || r.pertemuan) : '-'}</td>
+        <td>${escapeHtml(r.pertanyaan || '(kosong)')}</td>
+        <td>${r.status === 'valid' ? escapeHtml(r.opsi[r.jawabanBenar]) : '-'}</td>
+        <td>${r.status === 'valid' ? '✅ Valid' : '⚠️ ' + r.alasan}</td>
+      </tr>
+    `).join('');
+
+    wrap.style.display = 'block';
+    document.getElementById('btnConfirmImport').disabled = validCount === 0;
+  }
+
+  document.getElementById('btnCancelImport').addEventListener('click', () => {
+    parsedImportRows = [];
+    document.getElementById('importPreviewWrap').style.display = 'none';
+    document.getElementById('excelFileInput').value = '';
+  });
+
+  document.getElementById('btnConfirmImport').addEventListener('click', async () => {
+    const validRows = parsedImportRows.filter(r => r.status === 'valid');
+    if(validRows.length === 0) return;
+
+    const btn = document.getElementById('btnConfirmImport');
+    btn.disabled = true; btn.textContent = 'Mengimpor...';
+
+    // Hitung urutan awal per pertemuan berdasarkan soal yang sudah ada
+    const urutanCounter = {};
+    for(const pid of ['pretest','p1','p2','p3','posttest']){
+      const existing = await getDocs(query(collection(db, 'questions'), where('pertemuan', '==', pid)));
+      urutanCounter[pid] = existing.size;
+    }
+
+    let sukses = 0;
+    for(const r of validRows){
+      urutanCounter[r.pertemuan]++;
+      await addDoc(collection(db, 'questions'), {
+        pertemuan: r.pertemuan,
+        pertanyaan: r.pertanyaan,
+        opsi: r.opsi,
+        jawabanBenar: r.jawabanBenar,
+        urutan: urutanCounter[r.pertemuan]
+      });
+      sukses++;
+    }
+
+    showToast(`✅ ${sukses} soal berhasil diimpor!`);
+    parsedImportRows = [];
+    document.getElementById('importPreviewWrap').style.display = 'none';
+    document.getElementById('excelFileInput').value = '';
+    btn.disabled = false; btn.textContent = '✅ Import Soal yang Valid';
+    renderSoalTable();
+  });
+
+  /* ===== TAB SOAL: tambah satu per satu ===== */
   document.getElementById('btnSimpanSoal').addEventListener('click', async () => {
     const pertemuan = document.getElementById('soalPertemuan').value;
     const pertanyaan = document.getElementById('soalPertanyaan').value.trim();
@@ -279,28 +513,41 @@
       return;
     }
 
-    // Hitung urutan berikutnya untuk pertemuan ini
-    const existing = await getDocs(query(collection(db, 'questions'), where('pertemuan', '==', pertemuan)));
-    const urutan = existing.size + 1;
+    const btn = document.getElementById('btnSimpanSoal');
+    btn.disabled = true; btn.textContent = 'Menyimpan...';
+    try{
+      // Hitung urutan berikutnya untuk pertemuan ini
+      const existing = await getDocs(query(collection(db, 'questions'), where('pertemuan', '==', pertemuan)));
+      const urutan = existing.size + 1;
 
-    await addDoc(collection(db, 'questions'), {
-      pertemuan, pertanyaan, opsi, jawabanBenar: jawabanBenarIdx, urutan
-    });
+      await addDoc(collection(db, 'questions'), {
+        pertemuan, pertanyaan, opsi, jawabanBenar: jawabanBenarIdx, urutan
+      });
 
-    document.getElementById('soalPertanyaan').value = '';
-    opsiEls.forEach(el => el.value = '');
-    document.querySelector('input[name="jawabanBenar"][value="0"]').checked = true;
-    document.getElementById('soalSuccess').classList.add('show');
-    setTimeout(() => document.getElementById('soalSuccess').classList.remove('show'), 2000);
+      document.getElementById('soalPertanyaan').value = '';
+      opsiEls.forEach(el => el.value = '');
+      document.querySelector('input[name="jawabanBenar"][value="0"]').checked = true;
+      document.getElementById('soalSuccess').classList.add('show');
+      setTimeout(() => document.getElementById('soalSuccess').classList.remove('show'), 2000);
 
-    if(document.getElementById('filterSoalPertemuan').value === pertemuan) renderSoalTable();
+      if(document.getElementById('filterSoalPertemuan').value === pertemuan) renderSoalTable();
+    }catch(err){
+      showToast(friendlyError(err));
+    }
+    btn.disabled = false; btn.textContent = '➕ Simpan Soal';
   });
 
   async function renderSoalTable(){
     const pertemuan = document.getElementById('filterSoalPertemuan').value;
-    const q = query(collection(db, 'questions'), where('pertemuan', '==', pertemuan), orderBy('urutan'));
-    const snaps = await getDocs(q);
     const tbody = document.getElementById('soalTableBody');
+    let snaps;
+    try{
+      const q = query(collection(db, 'questions'), where('pertemuan', '==', pertemuan), orderBy('urutan'));
+      snaps = await getDocs(q);
+    }catch(err){
+      tbody.innerHTML = `<tr><td colspan="4" style="color:var(--on-danger); text-align:center;">${friendlyError(err)}</td></tr>`;
+      return;
+    }
     tbody.innerHTML = '';
     let no = 1;
     snaps.forEach(s => {
@@ -316,8 +563,12 @@
     tbody.querySelectorAll('[data-del]').forEach(btn => {
       btn.addEventListener('click', async () => {
         if(!confirm('Hapus soal ini?')) return;
-        await deleteDoc(doc(db, 'questions', btn.dataset.del));
-        renderSoalTable();
+        try{
+          await deleteDoc(doc(db, 'questions', btn.dataset.del));
+          renderSoalTable();
+        }catch(err){
+          showToast(friendlyError(err));
+        }
       });
     });
     if(snaps.size === 0){
@@ -366,9 +617,141 @@
     btn.disabled = false; btn.textContent = '➕ Buat Akun Siswa';
   });
 
+  /* ===== TAB TUGAS KODING ===== */
+  const TUGAS_LABEL = {
+    tantangan1: 'Tantangan 1 — Konversi Suhu',
+    tantangan2: 'Tantangan 2 — Kasir Cerdas + FIFO',
+    tantangan3: 'Tantangan 3 — Try-Except'
+  };
+  let tugasCache = [];
+
+  async function renderTugasTable(){
+    const tugasId = document.getElementById('filterTugas').value;
+    const tbody = document.getElementById('tugasTableBody');
+    let snaps;
+    try{
+      snaps = await getDocs(query(collection(db, 'submissions'), where('tugas', '==', tugasId)));
+    }catch(err){
+      tbody.innerHTML = `<tr><td colspan="5" style="color:var(--on-danger); text-align:center;">${friendlyError(err)}</td></tr>`;
+      return;
+    }
+    tugasCache = [];
+    snaps.forEach(s => tugasCache.push({ id: s.id, ...s.data() }));
+    tugasCache.sort((a,b) => (a.nama||'').localeCompare(b.nama||''));
+
+    tbody.innerHTML = '';
+    tugasCache.forEach(d => {
+      const status = d.dinilai ? `✅ Dinilai (${d.nilai})` : '📬 Menunggu Dinilai';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${escapeHtml(d.nisn)}</td>
+        <td>${escapeHtml(d.nama)}</td>
+        <td>${escapeHtml(d.kelas||'')}</td>
+        <td>${status}</td>
+        <td><button class="mini-btn" data-lihat="${d.id}">Lihat &amp; Nilai</button></td>`;
+      tbody.appendChild(tr);
+    });
+    if(tugasCache.length === 0){
+      tbody.innerHTML = '<tr><td colspan="5" style="color:var(--on-ink-soft); text-align:center;">Belum ada tugas yang dikumpulkan untuk ini.</td></tr>';
+    }
+    tbody.querySelectorAll('[data-lihat]').forEach(btn => {
+      btn.addEventListener('click', () => bukaLihatTugas(btn.dataset.lihat));
+    });
+  }
+
+  let activeSubmissionId = null;
+  function bukaLihatTugas(submissionId){
+    const d = tugasCache.find(x => x.id === submissionId);
+    if(!d) return;
+    activeSubmissionId = submissionId;
+    document.getElementById('lihatTugasCard').style.display = 'block';
+    document.getElementById('lihatTugasJudul').textContent = `${d.nama} (${d.nisn}) — ${TUGAS_LABEL[d.tugas] || d.tugas}`;
+    document.getElementById('lihatKodeSiswa').textContent = d.kode || '';
+    document.getElementById('adminOutputArea').innerHTML = '<span class="out-empty">Klik "Jalankan" untuk menguji kode ini.</span>';
+    document.getElementById('nilaiTugasInput').value = d.nilai ?? '';
+    document.getElementById('catatanTugasInput').value = d.catatanGuru ?? '';
+    document.getElementById('lihatTugasCard').scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+
+  document.getElementById('btnTutupLihatTugas').addEventListener('click', () => {
+    document.getElementById('lihatTugasCard').style.display = 'none';
+    activeSubmissionId = null;
+  });
+
+  document.getElementById('btnRunSubmission').addEventListener('click', () => {
+    const output = document.getElementById('adminOutputArea');
+    output.innerHTML = '';
+    const kode = document.getElementById('lihatKodeSiswa').textContent;
+    let buffered = '';
+    function skRead(x){
+      if(Sk.builtinFiles === undefined || Sk.builtinFiles['files'][x] === undefined) throw 'File tidak ditemukan: "' + x + '"';
+      return Sk.builtinFiles['files'][x];
+    }
+    Sk.configure({
+      output: (t) => { buffered += t; },
+      read: skRead,
+      inputfun: (p) => window.prompt(p || 'Masukkan nilai:') || '',
+      inputfunTakesPrompt: true,
+      __future__: Sk.python3
+    });
+    function printBuffered(){
+      if(buffered) buffered.split('\n').forEach((l,i,a) => {
+        if(l.length || i<a.length-1){
+          const div = document.createElement('div');
+          div.textContent = l;
+          output.appendChild(div);
+        }
+      });
+    }
+    Sk.misceval.asyncToPromise(() => Sk.importMainWithBody('<stdin>', false, kode, true))
+      .then(() => {
+        printBuffered();
+        if(output.children.length === 0) output.innerHTML = '<span class="out-empty">(Tidak ada output.)</span>';
+      }, (err) => {
+        printBuffered();
+        const errDiv = document.createElement('span');
+        errDiv.className = 'out-error';
+        errDiv.textContent = '⚠️ ' + err.toString();
+        output.appendChild(errDiv);
+      });
+  });
+
+  document.getElementById('btnSimpanNilaiTugas').addEventListener('click', async () => {
+    if(!activeSubmissionId) return;
+    const nilaiVal = document.getElementById('nilaiTugasInput').value;
+    const catatanVal = document.getElementById('catatanTugasInput').value.trim();
+    if(nilaiVal === '' || isNaN(nilaiVal) || nilaiVal < 0 || nilaiVal > 100){
+      showToast('Isi nilai antara 0-100 dulu.');
+      return;
+    }
+    const btn = document.getElementById('btnSimpanNilaiTugas');
+    btn.disabled = true; btn.textContent = 'Menyimpan...';
+    try{
+      await updateDoc(doc(db, 'submissions', activeSubmissionId), {
+        nilai: parseInt(nilaiVal),
+        catatanGuru: catatanVal || null,
+        dinilai: true
+      });
+      showToast('✅ Nilai tersimpan!');
+      document.getElementById('lihatTugasCard').style.display = 'none';
+      activeSubmissionId = null;
+      renderTugasTable();
+    }catch(err){
+      showToast(friendlyError(err));
+    }
+    btn.disabled = false; btn.textContent = '💾 Simpan Penilaian';
+  });
+
+  /* ===== TAB SISWA ===== */
   async function renderSiswaTable(){
-    const snaps = await getDocs(collection(db, 'students'));
     const tbody = document.getElementById('siswaTableBody');
+    let snaps;
+    try{
+      snaps = await getDocs(collection(db, 'students'));
+    }catch(err){
+      tbody.innerHTML = `<tr><td colspan="3" style="color:var(--on-danger); text-align:center;">${friendlyError(err)}</td></tr>`;
+      return;
+    }
     tbody.innerHTML = '';
     snaps.forEach(s => {
       const d = s.data();
@@ -385,19 +768,24 @@
   let allScoresCache = [];
   async function renderNilaiTable(){
     const filter = document.getElementById('filterNilaiPertemuan').value;
+    const tbody = document.getElementById('nilaiTableBody');
     let snaps;
-    if(filter === 'semua'){
-      snaps = await getDocs(collection(db, 'scores'));
-    } else {
-      snaps = await getDocs(query(collection(db, 'scores'), where('pertemuan', '==', filter)));
+    try{
+      if(filter === 'semua'){
+        snaps = await getDocs(collection(db, 'scores'));
+      } else {
+        snaps = await getDocs(query(collection(db, 'scores'), where('pertemuan', '==', filter)));
+      }
+    }catch(err){
+      tbody.innerHTML = `<tr><td colspan="6" style="color:var(--on-danger); text-align:center;">${friendlyError(err)}</td></tr>`;
+      return;
     }
     allScoresCache = [];
     snaps.forEach(s => allScoresCache.push(s.data()));
     allScoresCache.sort((a,b) => (a.nama||'').localeCompare(b.nama||''));
 
-    const tbody = document.getElementById('nilaiTableBody');
     tbody.innerHTML = '';
-    const pertLabel = { p1:'Pertemuan 1', p2:'Pertemuan 2', p3:'Pertemuan 3' };
+    const pertLabel = PERTEMUAN_LABEL;
     allScoresCache.forEach(d => {
       const tr = document.createElement('tr');
       tr.innerHTML = `<td>${escapeHtml(d.nisn)}</td><td>${escapeHtml(d.nama)}</td><td>${escapeHtml(d.kelas||'')}</td><td>${pertLabel[d.pertemuan]||d.pertemuan}</td><td>${d.benar}/${d.total}</td><td><strong>${d.persen}</strong></td>`;
@@ -410,7 +798,7 @@
 
   document.getElementById('btnExportCsv').addEventListener('click', () => {
     if(allScoresCache.length === 0){ showToast('Tidak ada data untuk diunduh.'); return; }
-    const pertLabel = { p1:'Pertemuan 1', p2:'Pertemuan 2', p3:'Pertemuan 3' };
+    const pertLabel = PERTEMUAN_LABEL;
     let csv = 'NISN,Nama,Kelas,Pertemuan,Benar,Total,Nilai\n';
     allScoresCache.forEach(d => {
       csv += `${d.nisn},"${d.nama}",${d.kelas||''},${pertLabel[d.pertemuan]||d.pertemuan},${d.benar},${d.total},${d.persen}\n`;
@@ -419,6 +807,91 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url; a.download = 'nilai-koding-ai-bab2.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  /* ===== N-GAIN (Pretest vs Posttest) ===== */
+  function kategoriGain(g){
+    if(g === null) return '-';
+    if(g >= 0.7) return 'Tinggi';
+    if(g >= 0.3) return 'Sedang';
+    return 'Rendah';
+  }
+
+  let ngainCache = [];
+
+  async function renderNgainTable(){
+    const tbody = document.getElementById('ngainTableBody');
+    let preSnaps, postSnaps;
+    try{
+      preSnaps = await getDocs(query(collection(db, 'scores'), where('pertemuan', '==', 'pretest')));
+      postSnaps = await getDocs(query(collection(db, 'scores'), where('pertemuan', '==', 'posttest')));
+    }catch(err){
+      tbody.innerHTML = `<tr><td colspan="7" style="color:var(--on-danger); text-align:center;">${friendlyError(err)}</td></tr>`;
+      return;
+    }
+
+    const preMap = {}, postMap = {};
+    preSnaps.forEach(s => { preMap[s.data().nisn] = s.data(); });
+    postSnaps.forEach(s => { postMap[s.data().nisn] = s.data(); });
+
+    const allNisn = [...new Set([...Object.keys(preMap), ...Object.keys(postMap)])];
+    ngainCache = allNisn.map(nisn => {
+      const pre = preMap[nisn];
+      const post = postMap[nisn];
+      let gain = null;
+      if(pre && post){
+        gain = pre.persen >= 100 ? 0 : (post.persen - pre.persen) / (100 - pre.persen);
+      }
+      return {
+        nisn,
+        nama: (post || pre)?.nama || '-',
+        kelas: (post || pre)?.kelas || '-',
+        pretest: pre ? pre.persen : null,
+        posttest: post ? post.persen : null,
+        gain
+      };
+    });
+    ngainCache.sort((a,b) => (a.nama||'').localeCompare(b.nama||''));
+
+    tbody.innerHTML = '';
+    ngainCache.forEach(d => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${escapeHtml(d.nisn)}</td>
+        <td>${escapeHtml(d.nama)}</td>
+        <td>${escapeHtml(d.kelas)}</td>
+        <td>${d.pretest !== null ? d.pretest : '<span style="color:var(--on-ink-soft);">belum</span>'}</td>
+        <td>${d.posttest !== null ? d.posttest : '<span style="color:var(--on-ink-soft);">belum</span>'}</td>
+        <td>${d.gain !== null ? d.gain.toFixed(2) : '-'}</td>
+        <td>${kategoriGain(d.gain)}</td>`;
+      tbody.appendChild(tr);
+    });
+    if(ngainCache.length === 0){
+      tbody.innerHTML = '<tr><td colspan="7" style="color:var(--on-ink-soft); text-align:center;">Belum ada data Pretest/Posttest.</td></tr>';
+    }
+
+    const validGains = ngainCache.filter(d => d.gain !== null).map(d => d.gain);
+    const summaryEl = document.getElementById('ngainSummary');
+    if(validGains.length > 0){
+      const avg = validGains.reduce((a,b)=>a+b,0) / validGains.length;
+      summaryEl.textContent = `Rata-rata N-Gain kelas: ${avg.toFixed(2)} (kategori ${kategoriGain(avg)}) — dari ${validGains.length} siswa yang sudah mengerjakan keduanya.`;
+    } else {
+      summaryEl.textContent = 'Belum ada siswa yang menyelesaikan Pretest DAN Posttest.';
+    }
+  }
+
+  document.getElementById('btnExportNgainCsv').addEventListener('click', () => {
+    if(ngainCache.length === 0){ showToast('Tidak ada data untuk diunduh.'); return; }
+    let csv = 'NISN,Nama,Kelas,Pretest,Posttest,N-Gain,Kategori\n';
+    ngainCache.forEach(d => {
+      csv += `${d.nisn},"${d.nama}",${d.kelas},${d.pretest ?? ''},${d.posttest ?? ''},${d.gain !== null ? d.gain.toFixed(2) : ''},${kategoriGain(d.gain)}\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'rekap-ngain-koding-ai-bab2.csv';
     a.click();
     URL.revokeObjectURL(url);
   });
