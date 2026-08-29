@@ -123,8 +123,8 @@ input:checked + .slider{background:var(--on-accent);}
 input:checked + .slider::before{transform:translateX(20px);}
 
 .opt-input-row{display:flex; align-items:center; gap:8px; margin-bottom:8px;}
-.opt-input-row input[type="radio"]{flex-shrink:0;}
-.opt-input-row input[type="text"]{flex:1;}
+.opt-input-row input[type="radio"]{flex-shrink:0; width:auto !important; flex:0 0 auto;}
+.opt-input-row input[type="text"]{flex:1 1 auto; width:auto !important;}
 
 .toast-on{
   position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--on-ink);
