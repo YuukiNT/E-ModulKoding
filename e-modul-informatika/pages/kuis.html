@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kuis · E-Modul Koding &amp; AI</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <div class="logo"><span class="emoji">💻</span> E-Modul Koding &amp; AI</div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Beranda</a></li>
+      <li><a href="ice-breaking.html">Ice Breaking</a></li>
+      <li><a href="materi.html">Materi</a></li>
+      <li><a href="coding-lab.html">Coding Lab</a></li>
+      <li><a href="latihan.html">Latihan</a></li>
+      <li><a href="detektif-bug.html">Detektif Bug</a></li>
+      <li><a href="kuis.html" class="active">Kuis</a></li>
+      <li><a href="evaluasi.html">Progres</a></li>
+    </ul>
+    <div class="nav-tools">
+      <button class="icon-btn" data-theme-toggle aria-label="Ganti tema">🌙</button>
+      <button class="hamburger" aria-label="Buka menu">☰</button>
+    </div>
+  </div>
+</nav>
+
+<section class="section">
+  <div class="container" style="max-width:640px;">
+    <div class="eyebrow">Evaluasi Pemahaman</div>
+    <h2 style="font-size:26px;">Kuis Akhir</h2>
+    <p style="color:var(--ink-soft);">10 soal mencakup seluruh Bab 1–6. Jawab satu per satu, skor muncul di akhir.</p>
+
+    <div id="quizArea">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <span id="quizProgressText" style="font-size:13px; color:var(--ink-soft);">1 / 10</span>
+      </div>
+      <div class="progress-track" style="margin-bottom:18px;"><div class="progress-fill" id="quizProgressFill" style="width:10%"></div></div>
+
+      <div class="quiz-box" id="quizBox"></div>
+
+      <div class="quiz-nav" style="display:flex; justify-content:space-between; gap:10px;">
+        <button class="btn ghost" id="btnPrev">← Sebelumnya</button>
+        <div>
+          <button class="btn" id="btnNext">Berikutnya →</button>
+          <button class="btn accent" id="btnFinish" style="display:none;">Selesai</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-box" id="quizResult" style="display:none;"></div>
+  </div>
+</section>
+
+<footer>E-Modul Koding dan Artifisial Intelijen · Bab 2 · SMP Negeri 9 Samarinda</footer>
+<button class="back-top" aria-label="Kembali ke atas">↑</button>
+
+<script src="../js/main.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/quiz.js"></script>
+</body>
+</html>

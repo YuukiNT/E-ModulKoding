@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coding Lab · E-Modul Koding &amp; AI</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/compiler.css">
+<link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <div class="logo"><span class="emoji">💻</span> E-Modul Koding &amp; AI</div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Beranda</a></li>
+      <li><a href="ice-breaking.html">Ice Breaking</a></li>
+      <li><a href="materi.html">Materi</a></li>
+      <li><a href="coding-lab.html" class="active">Coding Lab</a></li>
+      <li><a href="latihan.html">Latihan</a></li>
+      <li><a href="detektif-bug.html">Detektif Bug</a></li>
+      <li><a href="kuis.html">Kuis</a></li>
+      <li><a href="evaluasi.html">Progres</a></li>
+    </ul>
+    <div class="nav-tools">
+      <button class="icon-btn" data-theme-toggle aria-label="Ganti tema">🌙</button>
+      <button class="hamburger" aria-label="Buka menu">☰</button>
+    </div>
+  </div>
+</nav>
+
+<section class="section">
+  <div class="container">
+    <div class="lab-header">
+      <h1>💻 Coding Lab</h1>
+      <div style="display:flex; gap:8px;">
+        <button class="btn sm" id="btnCopy">📋 Salin</button>
+        <button class="btn sm ghost" id="btnReset">↻ Reset</button>
+      </div>
+    </div>
+
+    <div class="lab-task" id="labTaskText">
+      <strong>Info:</strong> Tulis kode <strong>Python</strong> di editor sebelah kiri — persis seperti di Thonny/VS Code — lalu klik <em>Jalankan</em> untuk melihat hasilnya di sebelah kanan. Gunakan <code>print()</code> untuk menampilkan sesuatu. Tekan Tab untuk indentasi otomatis.
+    </div>
+
+    <div class="lab-grid">
+      <div class="lab-panel">
+        <div class="panel-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>&nbsp;editor.py</div>
+        <div class="editor-wrap">
+          <div class="line-numbers" id="lineNumbers">1</div>
+          <textarea id="codeEditor" spellcheck="false" data-starter="def celsius_ke_fahrenheit(c):
+    f = (c * 9/5) + 32
+    return f
+
+hasil = celsius_ke_fahrenheit(30)
+print(&quot;Hasil dalam Fahrenheit:&quot;, hasil)">def celsius_ke_fahrenheit(c):
+    f = (c * 9/5) + 32
+    return f
+
+hasil = celsius_ke_fahrenheit(30)
+print("Hasil dalam Fahrenheit:", hasil)</textarea>
+        </div>
+      </div>
+      <div class="lab-panel">
+        <div class="panel-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>&nbsp;output</div>
+        <div class="output-area" id="outputArea"><span class="out-empty">(Belum ada output. Klik Jalankan untuk mencoba kodemu.)</span></div>
+        <div class="lab-actions">
+          <button class="btn accent" id="btnRun">▶ Jalankan</button>
+          <button class="btn sm ghost" id="btnClearOut">🧹 Bersihkan Output</button>
+        </div>
+      </div>
+    </div>
+
+    <p style="color:var(--ink-soft); font-size:13px; margin-top:6px;">
+      🔒 Catatan: kode Python-mu diterjemahkan oleh Skulpt (library yang berjalan di dalam browser) — tidak bisa mengakses data lain di halaman ini maupun internet, dan tetap berfungsi tanpa koneksi sama sekali.
+    </p>
+  </div>
+</section>
+
+<footer>E-Modul Koding dan Artifisial Intelijen · Bab 2 · SMP Negeri 9 Samarinda</footer>
+<button class="back-top" aria-label="Kembali ke atas">↑</button>
+
+<script src="../js/main.js"></script>
+<script src="../assets/js/skulpt/skulpt.min.js"></script>
+<script src="../assets/js/skulpt/skulpt-stdlib.js"></script>
+<script src="../js/compiler.js"></script>
+</body>
+</html>

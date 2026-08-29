@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ice Breaking · E-Modul Koding &amp; AI</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/icebreak.css">
+<link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <div class="logo"><span class="emoji">💻</span> E-Modul Koding &amp; AI</div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Beranda</a></li>
+      <li><a href="ice-breaking.html" class="active">Ice Breaking</a></li>
+      <li><a href="materi.html">Materi</a></li>
+      <li><a href="coding-lab.html">Coding Lab</a></li>
+      <li><a href="latihan.html">Latihan</a></li>
+      <li><a href="detektif-bug.html">Detektif Bug</a></li>
+      <li><a href="kuis.html">Kuis</a></li>
+      <li><a href="evaluasi.html">Progres</a></li>
+    </ul>
+    <div class="nav-tools">
+      <button class="icon-btn" data-theme-toggle aria-label="Ganti tema">🌙</button>
+      <button class="hamburger" aria-label="Buka menu">☰</button>
+    </div>
+  </div>
+</nav>
+
+<div class="ib-wrap">
+  <div class="ib-hero">
+    <div class="kicker">🎉 Sebelum Mulai Belajar</div>
+    <h1>Yuk Pemanasan Dulu!</h1>
+    <p>Tiga aktivitas ringan buat membangun suasana kelas sebelum masuk ke materi Bab 2 — santai, seru, tetap nyambung ke dunia koding.</p>
+  </div>
+
+  <div class="ib-main">
+
+    <div class="ib-card">
+      <span class="ib-num">1</span>
+      <h3>⚙️ Mesin Ajaib</h3>
+      <p class="desc">Ini analogi sederhana dari <strong>fungsi</strong> dalam pemrograman: ada <em>input</em> yang masuk, diproses di dalam "mesin", lalu keluar <em>output</em>-nya. Pilih satu benda, lalu proses!</p>
+
+      <div class="mesin-row">
+        <div class="mesin-slot" id="mesinInputSlot">➕</div>
+        <span class="mesin-arrow">→</span>
+        <div class="mesin-box" id="mesinBox">⚙️</div>
+        <span class="mesin-arrow">→</span>
+        <div class="mesin-slot" id="mesinOutputSlot">❓</div>
+      </div>
+
+      <div class="ib-select-row" id="mesinSelectRow"></div>
+      <div style="text-align:center;"><button class="ib-btn blue" id="btnProsesMesin">⚡ Proses!</button></div>
+    </div>
+
+    <div class="ib-card">
+      <span class="ib-num">2</span>
+      <h3>🎡 Roda Pertanyaan Seru</h3>
+      <p class="desc">Klik tombol untuk memunculkan pertanyaan acak. Jawab bergiliran bersama teman sekelas — jawaban lucu juga boleh!</p>
+
+      <div class="ib-question-box" id="ibQuestionBox">Klik "Putar!" untuk memunculkan pertanyaan pertama 👇</div>
+      <div style="text-align:center;"><button class="ib-btn" id="btnPutarPertanyaan">🎲 Putar!</button></div>
+    </div>
+
+    <div class="ib-card">
+      <span class="ib-num">3</span>
+      <h3>🕵️ Tebak Istilah Coding lewat Emoji</h3>
+      <p class="desc">Lihat kombinasi emoji-nya, lalu tebak istilah koding apa yang dimaksud!</p>
+
+      <p style="text-align:center; font-family:'SFMono-Regular', Consolas, monospace; font-size:12.5px; color:var(--ink-soft); margin-bottom:0;" id="ibEmojiRoundText">Ronde 1 dari 5</p>
+      <div class="ib-emoji-display" id="ibEmojiClue">🐛🔍</div>
+      <div class="ib-emoji-opts" id="ibEmojiOpts"></div>
+      <div class="ib-tally">Skor: <span id="ibEmojiScore">0</span></div>
+    </div>
+
+    <div style="text-align:center; margin-top:10px;">
+      <a href="materi.html" class="btn">Lanjut ke Materi Bab 2 →</a>
+    </div>
+
+  </div>
+</div>
+
+<footer>E-Modul Koding dan Artifisial Intelijen · Bab 2 · SMP Negeri 9 Samarinda</footer>
+<button class="back-top" aria-label="Kembali ke atas">↑</button>
+
+<script src="../js/main.js"></script>
+<script src="../js/icebreak.js"></script>
+</body>
+</html>

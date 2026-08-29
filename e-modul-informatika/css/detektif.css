@@ -1,0 +1,74 @@
+/* detektif.css — tema khusus halaman Detektif Debugging: gelap, ala game investigasi */
+.det-wrap{
+  background:#0e1428;
+  background-image:
+    radial-gradient(circle at 15% 8%, rgba(51,224,200,.10), transparent 40%),
+    radial-gradient(circle at 85% 15%, rgba(255,93,162,.10), transparent 40%);
+  color:#eef1fb;
+  margin:-1px 0 0 0;
+  padding-bottom:10px;
+}
+.det-hero{padding:54px 20px 30px 20px; text-align:center; max-width:720px; margin:0 auto;}
+.det-hero .kicker{font-family:"SFMono-Regular", Consolas, monospace; font-size:12px; letter-spacing:.15em; text-transform:uppercase; color:#ffd166;}
+.det-hero h1{font-family:"Trebuchet MS", sans-serif; font-size:clamp(24px,4.5vw,34px); margin:12px 0;}
+.det-hero p{color:#9aa5c9; font-size:15px; max-width:520px; margin:0 auto;}
+
+.det-stats{
+  display:flex; justify-content:center; gap:14px; margin:22px auto 0 auto; flex-wrap:wrap;
+}
+.det-chip{
+  background:#1b2447; border:1px solid #2c3766; padding:8px 16px; border-radius:20px;
+  font-family:"SFMono-Regular", Consolas, monospace; font-size:13px; color:#ffd166;
+}
+
+.det-main{max-width:640px; margin:0 auto; padding:20px 20px 50px 20px;}
+
+.case-card{
+  background:#1b2447; border:1px solid #2c3766; border-radius:16px; padding:22px 24px; margin-top:18px;
+}
+.case-card .case-tag{
+  font-family:"SFMono-Regular", Consolas, monospace; font-size:11px; color:#ffd166;
+  text-transform:uppercase; letter-spacing:.08em;
+}
+.case-card pre.det-code{
+  background:#0a0f22; border:1px solid #212c54; color:#d6e0ff; padding:16px 18px; border-radius:10px;
+  font-family:"SFMono-Regular", Consolas, monospace; font-size:13.3px; overflow-x:auto; line-height:1.65; margin-top:10px;
+}
+.case-card p.case-q{font-size:14.5px; margin:14px 0 8px 0;}
+
+.det-opt{
+  display:block; background:#212c54; border:1px solid #2c3766; border-radius:8px; padding:11px 14px;
+  margin:7px 0; font-size:13.5px; cursor:pointer; color:#eef1fb;
+}
+.det-opt:hover{border-color:#33e0c8;}
+.det-opt.correct{border-color:#4ade80; background:rgba(74,222,128,.14);}
+.det-opt.wrong{border-color:#ff6b6b; background:rgba(255,107,107,.14);}
+.det-opt input{margin-right:8px;}
+
+.det-btn{
+  font-family:"Trebuchet MS", sans-serif; font-weight:700; font-size:13px; border:none; border-radius:24px;
+  padding:10px 20px; cursor:pointer; background:#33e0c8; color:#082024; margin-top:12px;
+}
+.det-btn:hover{filter:brightness(1.08);}
+.det-btn.ghost{background:transparent; color:#eef1fb; border:1px solid #2c3766;}
+.det-btn.yellow{background:#ffd166; color:#2b1f00;}
+
+.det-feedback{margin-top:10px; font-family:"SFMono-Regular", Consolas, monospace; font-size:12.5px;}
+.det-feedback.ok{color:#4ade80;}
+.det-feedback.bad{color:#ff6b6b;}
+
+.det-nav-row{display:flex; justify-content:space-between; gap:10px; margin-top:16px; flex-wrap:wrap;}
+
+.det-summary{
+  background:#1b2447; border:1px solid #2c3766; border-radius:16px; padding:26px; text-align:center; margin-top:22px; display:none;
+}
+.det-summary.show{display:block;}
+.det-summary .big{font-family:"Trebuchet MS", sans-serif; font-size:38px; color:#ffd166;}
+.det-summary p{color:#9aa5c9; font-size:14px;}
+
+.det-toast{
+  position:fixed; top:80px; left:50%; transform:translateX(-50%) translateY(-14px); background:#212c54;
+  border:1px solid #33e0c8; color:#eef1fb; padding:12px 22px; border-radius:30px; font-family:"Trebuchet MS", sans-serif;
+  font-size:13.5px; font-weight:700; opacity:0; pointer-events:none; transition:.25s; z-index:400;
+}
+.det-toast.show{opacity:1; transform:translateX(-50%) translateY(0);}

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Materi · E-Modul Koding &amp; AI</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <div class="logo"><span class="emoji">💻</span> E-Modul Koding &amp; AI</div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Beranda</a></li>
+      <li><a href="ice-breaking.html">Ice Breaking</a></li>
+      <li><a href="materi.html" class="active">Materi</a></li>
+      <li><a href="coding-lab.html">Coding Lab</a></li>
+      <li><a href="latihan.html">Latihan</a></li>
+      <li><a href="detektif-bug.html">Detektif Bug</a></li>
+      <li><a href="kuis.html">Kuis</a></li>
+      <li><a href="evaluasi.html">Progres</a></li>
+    </ul>
+    <div class="nav-tools">
+      <button class="icon-btn" data-theme-toggle aria-label="Ganti tema">🌙</button>
+      <button class="hamburger" aria-label="Buka menu">☰</button>
+    </div>
+  </div>
+</nav>
+
+<section class="section">
+  <div class="container" style="max-width:760px;">
+    <div class="eyebrow">Bab 2 · Koding dan Artifisial Intelijen</div>
+    <h2 style="font-size:26px;">Membuat Program yang Lebih Canggih</h2>
+    <p style="color:var(--ink-soft);">Materi ditulis dalam bahasa Python — sama seperti yang kamu praktikkan di Thonny/VS Code di lab komputer. Klik tiap pertemuan untuk membuka.</p>
+
+    <!-- PERTEMUAN 1 -->
+    <div class="accordion-item">
+      <div class="accordion-head"><span><span class="badge">PERTEMUAN 1</span>Struktur Logika Kompleks</span><span class="chevron">▾</span></div>
+      <div class="accordion-body">
+        <h4>A. Tujuan Pembelajaran</h4>
+        <p>Menganalisis dan menerapkan struktur logika kompleks (nested if, nested loop, list methods, comparison chaining, fungsi modular) untuk merancang algoritma program secara sistematis.</p>
+
+        <h4>B. Apersepsi</h4>
+        <p>Bayangkan fungsi seperti "mesin pemroses": ada <em>input</em> yang masuk, ada <em>proses</em> di dalam mesin, lalu keluar <em>output</em>-nya. Fungsi dalam Python bekerja persis seperti itu.</p>
+
+        <h4>C. Materi — Nested If &amp; Comparison Chaining</h4>
+        <p><strong>Nested if</strong> adalah percabangan di dalam percabangan lain — dipakai saat ada lebih dari satu syarat yang harus dicek berurutan. Python juga punya jalan pintas <strong>comparison chaining</strong> untuk mengecek rentang nilai sekaligus.</p>
+        <pre class="code">nilai = 85
+<span style="color:#e07b39;">if</span> 80 &lt;= nilai &lt;= 90:
+    print(<span style="color:#2f9e5b;">"Nilai kamu di rentang 80-90!"</span>)</pre>
+
+        <h4>D. Materi — Nested Loop &amp; Metode List</h4>
+        <p><strong>Nested loop</strong> adalah perulangan di dalam perulangan lain. Tipe data list punya metode bawaan yang sering dipakai: <code>.append()</code> (menambah data), <code>.sort()</code> (mengurutkan), <code>.remove()</code> dan <code>.pop()</code> (menghapus data).</p>
+        <pre class="code">antrean = []
+antrean.append(<span style="color:#2f9e5b;">"Andi"</span>)
+antrean.append(<span style="color:#2f9e5b;">"Sari"</span>)
+pelanggan_pertama = antrean.pop(0)  <span style="color:#8a95ad;"># FIFO: yang pertama masuk, pertama dilayani</span>
+print(pelanggan_pertama)</pre>
+
+        <h4>E. Contoh Kode — Fungsi Konversi Suhu</h4>
+        <p>Fungsi (<code>def</code>) membungkus kode agar bisa dipanggil ulang tanpa menulis ulang. <code>return</code> mengirim balik hasilnya.</p>
+        <div class="code-wrap">
+          <pre class="code" id="code-p1">def celsius_ke_fahrenheit(c):
+    f = (c * 9/5) + 32
+    return f
+
+hasil = celsius_ke_fahrenheit(30)
+print("Hasil dalam Fahrenheit:", hasil)</pre>
+        </div>
+        <button class="btn sm accent" data-tryit="code-p1" data-tugas="">▶ Coba Logikanya di Coding Lab</button>
+
+        <h4>F. Coba Sendiri</h4>
+        <p>Di Thonny/VS Code, ubah nilai <code>c</code> pada pemanggilan fungsi, lalu jalankan lagi programnya.</p>
+
+        <h4>G. Tantangan 1</h4>
+        <p>Buat fungsi <code>fahrenheit_ke_kelvin(f)</code> yang mengonversi Fahrenheit ke Kelvin, lalu uji dengan beberapa nilai berbeda.</p>
+
+        <h4>H. Ringkasan</h4>
+        <p>Struktur logika kompleks (nested if, nested loop, fungsi, metode list) memungkinkan program menyelesaikan masalah yang lebih dari satu langkah keputusan.</p>
+
+        <h4>I. Latihan</h4>
+        <p><a href="latihan.html">Kerjakan latihan Pertemuan 1 →</a></p>
+
+        <h4>J. Refleksi</h4>
+        <textarea class="reflect" data-refleksi="p1" placeholder="Setelah mempelajari materi ini, apa hal baru yang kamu pahami?"></textarea>
+        <div style="margin-top:10px; display:flex; gap:8px;">
+          <button class="btn sm" data-simpan-refleksi="p1">Simpan Refleksi</button>
+          <button class="btn sm ghost" data-selesai="p1">✅ Tandai Pertemuan Ini Selesai</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PERTEMUAN 2 -->
+    <div class="accordion-item">
+      <div class="accordion-head"><span><span class="badge">PERTEMUAN 2</span>Kasir Cerdas &amp; Strategi Algoritma</span><span class="chevron">▾</span></div>
+      <div class="accordion-body">
+        <h4>A. Tujuan Pembelajaran</h4>
+        <p>Merancang dan memproduksi kode program terstruktur menggunakan variabel, kondisi bersarang, perulangan, serta strategi algoritma pada program Python (Kasir Cerdas).</p>
+
+        <h4>B. Apersepsi</h4>
+        <p>Pernah lihat kasir toko memberi poin belanja atau diskon otomatis? Di balik layar, itu program dengan percabangan bertingkat yang mengecek total belanjamu.</p>
+
+        <h4>C. Materi — Program Kasir Cerdas (Diskon &amp; Poin Berjenjang)</h4>
+        <p>Ini kode asli yang kamu kembangkan bersama kelompok saat proyek Kasir Cerdas — menghitung poin belanja berdasarkan total transaksi:</p>
+        <pre class="code" id="code-p2">total = int(input("Total belanja: "))
+poin = 0
+
+if total > 500000:
+    poin += 5
+elif total > 300000:
+    poin += 3
+elif total > 100000:
+    poin += 2
+
+print("Poin didapat:", poin)</pre>
+        <button class="btn sm accent" data-tryit="code-p2" data-tugas="">▶ Coba Logikanya di Coding Lab</button>
+
+        <h4>D. Materi — Simulasi Antrean FIFO</h4>
+        <p>Prinsip <strong>FIFO (First In First Out)</strong> — pelanggan yang datang duluan, dilayani duluan — dipakai untuk simulasi antrean, memakai <code>.append()</code> untuk menambah dan <code>.pop(0)</code> untuk melayani dari depan.</p>
+
+        <h4>E. Materi — Strategi Algoritma Greedy</h4>
+        <p>Algoritma <strong>Greedy</strong> selalu memilih langkah terbaik/terbesar di setiap tahap tanpa melihat keseluruhan hasil akhir — contohnya menentukan pecahan kembalian uang dengan jumlah lembar paling sedikit.</p>
+        <pre class="code">kembalian = 37000
+pecahan = [20000, 10000, 5000, 2000, 1000]
+hasil = []
+for p in pecahan:
+    while kembalian >= p:
+        hasil.append(p)
+        kembalian -= p
+print(hasil)</pre>
+
+        <h4>F. Coba Sendiri</h4>
+        <p>Ubah nilai <code>total</code> pada kode Kasir Cerdas dan cek apakah poin yang keluar sudah sesuai aturan diskon berjenjang.</p>
+
+        <h4>G. Tantangan 2 (Proyek Kelompok)</h4>
+        <p>Gabungkan program Kasir Cerdas dengan simulasi Antrean FIFO: setiap pelanggan dalam antrean dihitung poinnya berdasarkan total belanja masing-masing.</p>
+
+        <h4>H. Ringkasan</h4>
+        <p>Program yang canggih menggabungkan variabel, kondisi bersarang, dan strategi algoritma (seperti Greedy) untuk menyelesaikan masalah nyata secara efisien.</p>
+
+        <h4>I. Latihan</h4>
+        <p><a href="latihan.html">Kerjakan latihan Pertemuan 2 →</a></p>
+
+        <h4>J. Refleksi</h4>
+        <textarea class="reflect" data-refleksi="p2" placeholder="Setelah mempelajari materi ini, apa hal baru yang kamu pahami?"></textarea>
+        <div style="margin-top:10px; display:flex; gap:8px;">
+          <button class="btn sm" data-simpan-refleksi="p2">Simpan Refleksi</button>
+          <button class="btn sm ghost" data-selesai="p2">✅ Tandai Pertemuan Ini Selesai</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PERTEMUAN 3 -->
+    <div class="accordion-item">
+      <div class="accordion-head"><span><span class="badge">PERTEMUAN 3</span>Pengenalan Debugging</span><span class="chevron">▾</span></div>
+      <div class="accordion-body">
+        <h4>A. Tujuan Pembelajaran</h4>
+        <p>Mengidentifikasi 3 jenis bug (Syntax Error, Runtime Error, Logic Error) serta menerapkan teknik debugging untuk melacak dan memperbaiki kesalahan kode program Python.</p>
+
+        <h4>B. Apersepsi</h4>
+        <p>Program yang lebih canggih juga berarti lebih banyak kemungkinan bug. Seorang programmer yang baik bukan yang tidak pernah membuat bug, tapi yang cepat menemukan dan memperbaikinya.</p>
+
+        <h4>C. Materi — 3 Jenis Bug</h4>
+        <ul>
+          <li><strong>Syntax Error</strong> — kesalahan penulisan aturan bahasa (misal lupa tanda titik dua <code>:</code>).</li>
+          <li><strong>Runtime Error</strong> — program berhenti saat dijalankan karena hal tak terduga (misal membagi dengan nol).</li>
+          <li><strong>Logic Error</strong> — program berjalan lancar tanpa pesan error, tapi hasilnya salah.</li>
+        </ul>
+
+        <h4>D. Materi — Membaca Traceback &amp; try-except</h4>
+        <p>Pesan error di Python disebut <strong>Traceback</strong> — berisi petunjuk baris mana yang bermasalah. Blok <code>try-except</code> dipakai untuk menangani error agar program tidak langsung berhenti.</p>
+        <pre class="code">try:
+    angka = int(input("Masukkan angka: "))
+    print(100 / angka)
+except:
+    print("⚠️ Terjadi kesalahan, pastikan input berupa angka bukan 0.")</pre>
+
+        <h4>E. Aktivitas — Detektif Debugging</h4>
+        <p>Sekarang saatnya praktik langsung! Buka halaman khusus <strong>Detektif Debugging</strong> untuk memecahkan 5 kasus kode bermasalah dari materi Bab 2.</p>
+        <a href="detektif-bug.html" class="btn sm accent">🕵️ Buka Detektif Debugging</a>
+
+        <h4>F. Langkah Debugging</h4>
+        <ol>
+          <li>Baca pesan Traceback untuk tahu baris mana yang bermasalah.</li>
+          <li>Tambahkan <code>print()</code> di beberapa titik untuk melacak nilai variabel.</li>
+          <li>Telusuri logika program baris demi baris.</li>
+          <li>Perbaiki satu bug dalam satu waktu, lalu uji ulang.</li>
+        </ol>
+
+        <h4>G. Tantangan 3</h4>
+        <p>Ambil program Kasir Cerdas dari Pertemuan 2, lalu tambahkan blok <code>try-except</code> agar program tidak error jika pengguna memasukkan huruf, bukan angka.</p>
+
+        <h4>H. Ringkasan</h4>
+        <p>Debugging adalah keterampilan penting: mengenali jenis bug, menelusuri Traceback, dan memperbaiki kesalahan secara sistematis.</p>
+
+        <h4>I. Latihan</h4>
+        <p><a href="latihan.html">Kerjakan latihan Pertemuan 3 →</a></p>
+
+        <h4>J. Refleksi</h4>
+        <textarea class="reflect" data-refleksi="p3" placeholder="Setelah mempelajari seluruh Bab 2, apa yang paling kamu pahami dan apa yang masih perlu dipelajari lagi?"></textarea>
+        <div style="margin-top:10px; display:flex; gap:8px;">
+          <button class="btn sm" data-simpan-refleksi="p3">Simpan Refleksi</button>
+          <button class="btn sm ghost" data-selesai="p3">✅ Tandai Pertemuan Ini Selesai</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:26px; display:flex; gap:10px; flex-wrap:wrap;">
+      <a href="detektif-bug.html" class="btn">🕵️ Main Detektif Debugging</a>
+      <a href="kuis.html" class="btn ghost">Lanjut ke Kuis →</a>
+    </div>
+  </div>
+</section>
+
+<footer>E-Modul Koding dan Artifisial Intelijen · Bab 2 · SMP Negeri 9 Samarinda</footer>
+<button class="back-top" aria-label="Kembali ke atas">↑</button>
+
+<script src="../js/main.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/compiler.js"></script>
+<script>
+  initAccordion();
+
+  document.querySelectorAll('[data-tryit]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const code = document.getElementById(btn.dataset.tryit).textContent;
+      kirimKeCodingLab(code, btn.dataset.tugas || '');
+    });
+  });
+  document.querySelectorAll('[data-simpan-refleksi]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const babId = btn.dataset.simpanRefleksi;
+      const ta = document.querySelector(`textarea[data-refleksi="${babId}"]`);
+      setRefleksi(babId, ta.value);
+      showToast('Refleksi tersimpan ✅');
+    });
+  });
+  document.querySelectorAll('[data-selesai]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      setBabSelesai(btn.dataset.selesai);
+      showToast('Pertemuan ditandai selesai 🎉');
+    });
+  });
+</script>
+</body>
+</html>

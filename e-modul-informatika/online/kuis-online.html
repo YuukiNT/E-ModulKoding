@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kuis Online · Bab 2</title>
+<link rel="stylesheet" href="css/online.css">
+</head>
+<body>
+
+<div class="on-topbar">
+  <div class="brand">🎓 Kuis Online · Koding &amp; AI Bab 2</div>
+  <div class="who">
+    <span id="whoText">Memuat...</span>
+    <button id="btnLogout">Keluar</button>
+  </div>
+</div>
+
+<div class="on-main">
+
+  <!-- DASHBOARD: daftar pertemuan -->
+  <div id="dashboardView">
+    <h2 style="margin-bottom:4px;">Halo, <span id="namaSiswa">Siswa</span> 👋</h2>
+    <p style="color:var(--on-ink-soft); margin-top:0;">Pilih pertemuan yang sudah dibuka oleh gurumu untuk mulai mengerjakan kuis.</p>
+
+    <div class="pert-grid" id="pertGrid"></div>
+  </div>
+
+  <!-- QUIZ VIEW -->
+  <div id="quizView" style="display:none;">
+    <button class="on-btn secondary sm" id="btnBackDash" style="margin-bottom:18px;">← Kembali ke Daftar Pertemuan</button>
+    <div class="q-progress">
+      <span id="qProgressText">Soal 1 / 10</span>
+      <span id="qPertemuanTitle"></span>
+    </div>
+    <div class="q-track"><div class="q-fill" id="qFill" style="width:0%"></div></div>
+
+    <div class="q-box" id="qBox"></div>
+
+    <div style="display:flex; justify-content:space-between; margin-top:18px;">
+      <button class="on-btn secondary" id="btnQPrev" style="width:auto; padding:10px 18px;">← Sebelumnya</button>
+      <div>
+        <button class="on-btn" id="btnQNext" style="width:auto; padding:10px 18px;">Berikutnya →</button>
+        <button class="on-btn accent" id="btnQFinish" style="width:auto; padding:10px 18px; display:none;">Kumpulkan Jawaban</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT VIEW -->
+  <div id="resultView" style="display:none; text-align:center; padding:40px 0;">
+    <div style="font-size:42px;" id="resultEmoji">🎉</div>
+    <h2 id="resultTitle">Nilai: 0</h2>
+    <p id="resultDetail" style="color:var(--on-ink-soft);"></p>
+    <button class="on-btn" id="btnBackDash2" style="width:auto; padding:11px 22px; margin-top:14px;">Kembali ke Daftar Pertemuan</button>
+  </div>
+
+</div>
+
+<div class="toast-on" id="toastOn"></div>
+
+<script type="module">
+  import {
+    auth, db, onAuthStateChanged, signOut, STUDENT_EMAIL_DOMAIN,
+    doc, getDoc, getDocs, collection, query, where, orderBy, setDoc, serverTimestamp
+  } from "./js/firebase-init.js";
+
+  const PERTEMUAN_LIST = [
+    { id:'p1', title:'Pertemuan 1', sub:'Struktur Logika Kompleks' },
+    { id:'p2', title:'Pertemuan 2', sub:'Kasir Cerdas & Strategi Algoritma' },
+    { id:'p3', title:'Pertemuan 3', sub:'Pengenalan Debugging' },
+  ];
+
+  let currentStudent = null; // { nisn, nama, kelas }
+  let currentPertemuanStatus = {}; // { p1: {unlocked}, p2:..., p3:... }
+  let currentScores = {}; // { p1: {benar,total,persen}, ... }
+
+  function showToast(msg){
+    const t = document.getElementById('toastOn');
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(()=>t.classList.remove('show'), 2200);
+  }
+
+  onAuthStateChanged(auth, async (user) => {
+    if(!user || !user.email || !user.email.endsWith('@' + STUDENT_EMAIL_DOMAIN)){
+      window.location.href = 'login.html';
+      return;
+    }
+    const nisn = user.email.replace('@' + STUDENT_EMAIL_DOMAIN, '');
+    const studentDoc = await getDoc(doc(db, 'students', nisn));
+    if(!studentDoc.exists()){
+      showToast('Data siswa tidak ditemukan. Hubungi guru.');
+      return;
+    }
+    currentStudent = { nisn, ...studentDoc.data() };
+    document.getElementById('whoText').textContent = currentStudent.nama + ' · ' + (currentStudent.kelas || '');
+    document.getElementById('namaSiswa').textContent = currentStudent.nama;
+
+    await loadPertemuanStatus();
+    await loadScores();
+    renderDashboard();
+  });
+
+  document.getElementById('btnLogout').addEventListener('click', async () => {
+    await signOut(auth);
+    sessionStorage.removeItem('emodul_student_nisn');
+    window.location.href = 'login.html';
+  });
+
+  async function loadPertemuanStatus(){
+    for(const p of PERTEMUAN_LIST){
+      const snap = await getDoc(doc(db, 'pertemuanStatus', p.id));
+      currentPertemuanStatus[p.id] = snap.exists() ? snap.data() : { unlocked: p.id === 'p1' };
+    }
+  }
+
+  async function loadScores(){
+    const q = query(collection(db, 'scores'), where('nisn', '==', currentStudent.nisn));
+    const snaps = await getDocs(q);
+    snaps.forEach(s => { currentScores[s.data().pertemuan] = s.data(); });
+  }
+
+  function renderDashboard(){
+    document.getElementById('dashboardView').style.display = 'block';
+    document.getElementById('quizView').style.display = 'none';
+    document.getElementById('resultView').style.display = 'none';
+
+    const grid = document.getElementById('pertGrid');
+    grid.innerHTML = '';
+    PERTEMUAN_LIST.forEach(p => {
+      const unlocked = currentPertemuanStatus[p.id]?.unlocked;
+      const score = currentScores[p.id];
+      const card = document.createElement('div');
+      card.className = 'pert-card';
+      let statusHtml, actionHtml;
+      if(!unlocked){
+        statusHtml = '<div class="status locked">🔒 Terkunci</div>';
+        actionHtml = '<p style="margin-top:14px;">Menunggu gurumu membuka pertemuan ini.</p>';
+      } else if(score){
+        statusHtml = '<div class="status done">✅ Sudah Dikerjakan</div>';
+        actionHtml = `<div class="score">${score.persen}</div><p>${score.benar}/${score.total} benar</p><button class="on-btn secondary sm" data-start="${p.id}">Kerjakan Lagi</button>`;
+      } else {
+        statusHtml = '<div class="status unlocked">🟢 Terbuka</div>';
+        actionHtml = '<button class="on-btn sm" data-start="' + p.id + '" style="width:auto; padding:10px 20px; margin-top:10px;">Mulai Kuis</button>';
+      }
+      card.innerHTML = `${statusHtml}<h3>${p.title}</h3><p style="margin-top:-4px;">${p.sub}</p>${actionHtml}`;
+      grid.appendChild(card);
+    });
+    grid.querySelectorAll('[data-start]').forEach(btn => {
+      btn.addEventListener('click', () => startQuiz(btn.dataset.start));
+    });
+  }
+
+  document.getElementById('btnBackDash').addEventListener('click', renderDashboard);
+  document.getElementById('btnBackDash2').addEventListener('click', renderDashboard);
+
+  /* ===== QUIZ LOGIC ===== */
+  let quizPertemuan = null;
+  let quizQuestions = [];
+  let quizIndex = 0;
+  let quizAnswers = [];
+
+  async function startQuiz(pertemuanId){
+    if(!currentPertemuanStatus[pertemuanId]?.unlocked){
+      showToast('Pertemuan ini masih terkunci.');
+      return;
+    }
+    const q = query(collection(db, 'questions'), where('pertemuan', '==', pertemuanId), orderBy('urutan'));
+    const snaps = await getDocs(q);
+    quizQuestions = [];
+    snaps.forEach(s => quizQuestions.push({ id: s.id, ...s.data() }));
+
+    if(quizQuestions.length === 0){
+      showToast('Belum ada soal untuk pertemuan ini. Hubungi guru.');
+      return;
+    }
+
+    quizPertemuan = PERTEMUAN_LIST.find(p => p.id === pertemuanId);
+    quizIndex = 0;
+    quizAnswers = new Array(quizQuestions.length).fill(null);
+
+    document.getElementById('dashboardView').style.display = 'none';
+    document.getElementById('quizView').style.display = 'block';
+    document.getElementById('qPertemuanTitle').textContent = quizPertemuan.title;
+    renderQuestion();
+  }
+
+  function renderQuestion(){
+    const item = quizQuestions[quizIndex];
+    const box = document.getElementById('qBox');
+    box.innerHTML = `
+      <p style="font-weight:700; font-size:15.5px; margin:0 0 16px 0;">${item.pertanyaan}</p>
+      ${item.opsi.map((opt,i) => `
+        <label class="q-opt">
+          <input type="radio" name="qOpt" value="${i}" ${quizAnswers[quizIndex]===i?'checked':''}> ${opt}
+        </label>`).join('')}
+    `;
+    box.querySelectorAll('input[name="qOpt"]').forEach(inp => {
+      inp.addEventListener('change', () => { quizAnswers[quizIndex] = parseInt(inp.value); });
+    });
+    document.getElementById('qProgressText').textContent = `Soal ${quizIndex+1} / ${quizQuestions.length}`;
+    document.getElementById('qFill').style.width = ((quizIndex+1)/quizQuestions.length*100) + '%';
+    document.getElementById('btnQPrev').disabled = quizIndex === 0;
+    document.getElementById('btnQNext').style.display = quizIndex === quizQuestions.length-1 ? 'none' : 'inline-flex';
+    document.getElementById('btnQFinish').style.display = quizIndex === quizQuestions.length-1 ? 'inline-flex' : 'none';
+  }
+
+  document.getElementById('btnQPrev').addEventListener('click', () => { quizIndex--; renderQuestion(); });
+  document.getElementById('btnQNext').addEventListener('click', () => {
+    if(quizAnswers[quizIndex] === null){ showToast('Pilih salah satu jawaban dulu.'); return; }
+    quizIndex++; renderQuestion();
+  });
+  document.getElementById('btnQFinish').addEventListener('click', async () => {
+    if(quizAnswers[quizIndex] === null){ showToast('Pilih salah satu jawaban dulu.'); return; }
+    let benar = 0;
+    quizQuestions.forEach((q, i) => { if(quizAnswers[i] === q.jawabanBenar) benar++; });
+    const total = quizQuestions.length;
+    const persen = Math.round((benar/total)*100);
+
+    const scoreId = currentStudent.nisn + '_' + quizPertemuan.id;
+    await setDoc(doc(db, 'scores', scoreId), {
+      nisn: currentStudent.nisn,
+      nama: currentStudent.nama,
+      kelas: currentStudent.kelas || '',
+      pertemuan: quizPertemuan.id,
+      benar, total, persen,
+      waktu: serverTimestamp()
+    });
+    currentScores[quizPertemuan.id] = { benar, total, persen };
+
+    document.getElementById('quizView').style.display = 'none';
+    document.getElementById('resultView').style.display = 'block';
+    document.getElementById('resultEmoji').textContent = persen >= 75 ? '🎉' : '💪';
+    document.getElementById('resultTitle').textContent = 'Nilai: ' + persen;
+    document.getElementById('resultDetail').textContent = `Benar ${benar} dari ${total} soal — ${quizPertemuan.title}`;
+  });
+</script>
+</body>
+</html>

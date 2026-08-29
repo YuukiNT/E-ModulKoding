@@ -1,0 +1,77 @@
+CARA MENJALANKAN E-MODUL INFORMATIKA SECARA LOKAL
+====================================================
+
+CARA PALING SEDERHANA (tanpa internet, tanpa software tambahan)
+1. Ekstrak/unzip folder "e-modul-informatika".
+2. Buka folder tersebut, lalu klik dua kali file "index.html".
+3. E-modul akan terbuka di browser (Chrome/Edge/Firefox) dan langsung bisa dipakai.
+
+CATATAN:
+- Semua fitur (materi, Coding Lab, latihan, kuis, progres) berjalan
+  sepenuhnya di dalam file ini, tanpa perlu koneksi internet.
+- Progres belajar (bab selesai, nilai kuis) disimpan di penyimpanan
+  lokal browser (localStorage) pada komputer/perangkat yang dipakai.
+  Jika e-modul dibuka di komputer lain, progres akan mulai dari nol lagi.
+
+CARA ALTERNATIF DENGAN LIVE SERVER (opsional, untuk pengembangan)
+Jika ingin membuka lewat server lokal (misalnya saat mengedit dengan
+VS Code dan ekstensi "Live Server"):
+1. Buka folder "e-modul-informatika" di VS Code.
+2. Klik kanan pada file "index.html" > "Open with Live Server".
+3. Browser akan otomatis terbuka menampilkan e-modul.
+
+UNTUK VERSI ONLINE (opsional)
+Folder ini juga bisa diunggah apa adanya ke layanan hosting statis
+gratis (misalnya GitHub Pages atau Netlify) agar bisa diakses lewat
+internet dari luar sekolah — tanpa perlu mengubah kode sama sekali,
+karena tidak memakai backend/server khusus.
+
+STRUKTUR FOLDER
+e-modul-informatika/
+├── index.html              (Beranda)
+├── pages/
+│   ├── petunjuk.html
+│   ├── ice-breaking.html    (Pemanasan: Mesin Ajaib, Roda Pertanyaan, Tebak Emoji)
+│   ├── materi.html          (3 Pertemuan sesuai Modul Ajar Bab 2)
+│   ├── coding-lab.html      (Menjalankan Python asli lewat Skulpt)
+│   ├── latihan.html
+│   ├── detektif-bug.html    (Game Detektif Debugging)
+│   ├── kuis.html
+│   └── evaluasi.html
+├── css/
+│   ├── style.css
+│   ├── compiler.css
+│   ├── detektif.css
+│   ├── icebreak.css
+│   └── responsive.css
+├── js/
+│   ├── main.js
+│   ├── compiler.js
+│   ├── quiz.js
+│   ├── latihan.js
+│   ├── detektif.js
+│   ├── icebreak.js
+│   └── progress.js
+├── assets/
+│   ├── images/
+│   ├── icons/
+│   └── js/skulpt/           (Library Skulpt — Python-di-browser, offline)
+│       ├── skulpt.min.js
+│       └── skulpt-stdlib.js
+
+CATATAN ISI
+Materi disesuaikan dengan Modul Ajar Kurikulum Merdeka Bab 2: Membuat
+Program yang Lebih Canggih (Koding dan Artifisial Intelijen, Kelas IX,
+SMP Negeri 9 Samarinda) — 3 pertemuan: Struktur Logika Kompleks, Kasir
+Cerdas & Strategi Algoritma, dan Pengenalan Debugging.
+
+Coding Lab menjalankan PYTHON ASLI (bukan simulasi, bukan JavaScript)
+lewat library Skulpt yang sudah dibundel offline di folder
+assets/js/skulpt/ — tidak butuh internet sama sekali, termasuk
+mendukung input(), percabangan, perulangan, fungsi, list, dan pesan
+error Python yang sebenarnya (SyntaxError, ZeroDivisionError, dst).
+
+Soal Kuis diambil dari bank soal asesmen sumatif modul ajar asli.
+Halaman Ice Breaking berisi 3 aktivitas pemanasan sebelum kelas
+dimulai, dan halaman Detektif Debugging berisi 5 kasus debugging
+interaktif dari materi Pertemuan 3.
