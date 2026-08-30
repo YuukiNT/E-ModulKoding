@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E-Modul Koding &amp; AI · Bab 2 Kelas IX</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <div class="logo"><span class="emoji">💻</span> E-Modul Koding &amp; AI</div>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Beranda</a></li>
+      <li><a href="pages/ice-breaking.html">Ice Breaking</a></li>
+      <li><a href="pages/materi.html">Materi</a></li>
+      <li><a href="pages/mode-sederhana.html">Mode ABK</a></li>
+      <li><a href="pages/coding-lab.html">Coding Lab</a></li>
+      <li><a href="pages/latihan.html">Latihan</a></li>
+      <li><a href="pages/flashcard.html">Flashcard</a></li>
+      <li><a href="pages/cheat-sheet.html">Cheat Sheet</a></li>
+      <li><a href="pages/detektif-bug.html">Detektif Bug</a></li>
+      <li><a href="pages/kuis.html">Kuis</a></li>
+      <li><a href="pages/evaluasi.html">Progres</a></li>
+    </ul>
+    <div class="nav-tools">
+      <button class="icon-btn" data-theme-toggle aria-label="Ganti tema">🌙</button>
+      <button class="hamburger" aria-label="Buka menu">☰</button>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <h1>💻 Membuat Program yang Lebih Canggih</h1>
+    <p class="lead">E-modul Bab 2 · Koding dan Artifisial Intelijen — belajar struktur logika kompleks, strategi algoritma, dan debugging lewat materi interaktif, Coding Lab, dan game Detektif Debugging.</p>
+    <a href="pages/ice-breaking.html" class="btn">Mulai Belajar</a>
+    <div><span class="school-tag">🏫 SMP Negeri 9 Samarinda</span></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="card-grid">
+      <div class="card">
+        <div class="icon">🎉</div>
+        <h3>Ice Breaking</h3>
+        <p>Pemanasan seru sebelum belajar: Mesin Ajaib, Roda Pertanyaan, dan tebak istilah coding lewat emoji.</p>
+      </div>
+      <div class="card">
+        <div class="icon">📖</div>
+        <h3>Materi 3 Pertemuan</h3>
+        <p>Struktur logika kompleks, Kasir Cerdas &amp; strategi algoritma, hingga pengenalan debugging.</p>
+      </div>
+      <div class="card">
+        <div class="icon">💻</div>
+        <h3>Coding Lab</h3>
+        <p>Tulis dan jalankan kode <strong>Python asli</strong> langsung di browser, lihat hasilnya seketika — tanpa perlu buka Thonny.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🕵️</div>
+        <h3>Detektif Debugging</h3>
+        <p>Pecahkan 5 kasus kode bermasalah dan kenali jenis-jenis bug seperti detektif sungguhan.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Progres Belajarmu</div>
+      <h2>Sejauh mana kamu sudah belajar?</h2>
+    </div>
+    <div id="progressSnapshot"></div>
+    <a href="pages/evaluasi.html" class="btn ghost" style="margin-top:8px;">Lihat Detail Progres</a>
+  </div>
+</section>
+
+<section class="section" style="background:linear-gradient(135deg, rgba(51,85,217,.06), rgba(245,147,74,.06)); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+  <div class="container" style="text-align:center;">
+    <div class="eyebrow">Kuis Resmi</div>
+    <h2 style="margin-bottom:6px;">Kuis Online Bergilir per Pertemuan</h2>
+    <p style="color:var(--ink-soft); max-width:520px; margin:0 auto 20px auto;">Nilai kuis resmi dicatat terpusat oleh guru, dan pertemuan baru dibuka satu per satu sesuai jadwal kelas. Bagian ini butuh koneksi internet.</p>
+    <a href="online/login.html" class="btn accent">🎓 Masuk Kuis Online (Siswa)</a>
+    <a href="online/admin.html" class="btn ghost" style="margin-left:8px;">🔑 Panel Admin (Guru)</a>
+  </div>
+</section>
+
+<footer>E-Modul Koding dan Artifisial Intelijen · Bab 2 · SMP Negeri 9 Samarinda</footer>
+<button class="back-top" aria-label="Kembali ke atas">↑</button>
+
+<script src="js/main.js"></script>
+<script src="js/progress.js"></script>
+<script>renderProgressBars('#progressSnapshot');</script>
+</body>
+</html>

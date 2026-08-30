@@ -1,0 +1,31 @@
+.lab-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:18px 0;}
+.lab-panel{
+  background:#0f1621; border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(20,30,60,.08);
+  display:flex; flex-direction:column;
+}
+.panel-bar{
+  background:#0a0f1a; color:#9aa8bb; font-family:"SFMono-Regular", Consolas, monospace; font-size:12px;
+  padding:9px 14px; display:flex; align-items:center; gap:8px;
+}
+.panel-bar .dot{width:9px; height:9px; border-radius:50%;}
+.panel-bar .dot.r{background:#e3564a;} .panel-bar .dot.y{background:#f0b429;} .panel-bar .dot.g{background:#0f9d6b;}
+
+.editor-wrap{display:flex; flex:1; min-height:260px;}
+.line-numbers{
+  padding:14px 10px; text-align:right; color:#465974; font-family:"SFMono-Regular", Consolas, monospace;
+  font-size:13px; line-height:1.6; user-select:none; border-right:1px solid #1f2a3b;
+}
+#codeEditor, .code-view{
+  flex:1; background:#0f1621; color:#dbe6f3; border:none; outline:none; resize:none;
+  font-family:"SFMono-Regular", Consolas, monospace; font-size:13px; line-height:1.6; padding:14px; white-space:pre;
+}
+.output-area{
+  flex:1; min-height:260px; background:#0a0f1a; color:#dbe6f3; padding:14px;
+  font-family:"SFMono-Regular", Consolas, monospace; font-size:13px; line-height:1.6; overflow-y:auto; white-space:pre-wrap;
+}
+.output-area .out-log{color:#c7d3e2;}
+.output-area .out-error{color:#f3a49c; background:rgba(227,86,74,.12); padding:8px 10px; border-radius:6px; margin-top:4px; display:block; white-space:pre-wrap;}
+.output-area .out-empty{color:#465974; font-style:italic;}
+.lab-actions{display:flex; gap:10px; padding:12px 14px; border-top:1px solid #1f2a3b; flex-wrap:wrap;}
+
+@media (max-width:820px){ .lab-grid{grid-template-columns:1fr;} }

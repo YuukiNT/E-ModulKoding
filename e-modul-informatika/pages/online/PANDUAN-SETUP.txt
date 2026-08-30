@@ -1,0 +1,168 @@
+PANDUAN LENGKAP: SISTEM KUIS ONLINE (LOGIN + NILAI TERPUSAT)
+================================================================
+
+Bagian "online" ini TERPISAH dari e-modul offline. E-modul offline
+(index.html di folder utama) tetap 100% jalan tanpa internet seperti
+biasa. Folder "online/" ini KHUSUS untuk kuis resmi yang butuh
+internet, login, dan nilainya tersimpan terpusat.
+
+
+LANGKAH 1 — Isi firebase-config.js
+------------------------------------
+Buka online/firebase-config.js, ganti semua nilai "GANTI_DENGAN_..."
+dengan konfigurasi asli dari project Firebase-mu (Firebase Console >
+Project Settings > scroll ke "Your apps").
+
+
+LANGKAH 2 — Daftarkan diri sebagai Admin (PENTING, jangan dilewati!)
+------------------------------------
+Setelah kamu membuat akun admin lewat Firebase Console (Authentication
+> Users > Add user), kamu HARUS mendaftarkan akun itu sebagai admin
+di Firestore juga, supaya sistem tahu kamu benar-benar admin (bukan
+siswa biasa). Caranya:
+
+1. Di Firebase Console, buka Authentication > Users.
+2. Klik akun admin yang tadi kamu buat, salin nilai "User UID"-nya
+   (deretan huruf-angka panjang).
+3. Buka Firestore Database > Data > "Start collection".
+4. Nama collection: admins
+5. Document ID: tempel User UID yang tadi disalin (JANGAN pakai ID
+   otomatis — harus persis UID-nya).
+6. Tambahkan field apa saja, misalnya: role (string) = admin
+7. Klik Save.
+
+Tanpa langkah ini, halaman admin.html tidak akan bisa menyimpan soal
+atau membuka pertemuan (akan ditolak oleh aturan keamanan).
+
+
+LANGKAH 3 — Pasang Aturan Keamanan Firestore
+------------------------------------
+⚠️ PENTING kalau kamu sebelumnya sudah pernah menempel Rules versi
+lama: buka lagi Firebase Console > Firestore Database > tab "Rules",
+HAPUS SEMUA isinya, lalu tempel ulang versi TERBARU di bawah ini
+(sudah termasuk aturan untuk fitur Kumpul Tugas Koding), klik
+"Publish" lagi. Kalau tidak diulang, fitur Kumpul Tugas akan gagal
+dengan pesan "Akses ditolak sistem".
+
+Buka Firebase Console > Firestore Database > tab "Rules", hapus
+semua isinya, lalu tempel aturan di bawah ini, klik "Publish":
+
+--------------------------------------------------------------
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    function isLoggedIn() {
+      return request.auth != null;
+    }
+
+    match /admins/{uid} {
+      allow read: if isAdmin();
+      allow write: if false; // hanya diedit manual lewat Firebase Console
+    }
+
+    match /students/{nisn} {
+      allow read: if isAdmin() ||
+        (isLoggedIn() && request.auth.token.email == nisn + '@siswa.emodul.local');
+      allow write: if isAdmin();
+    }
+
+    match /pertemuanStatus/{id} {
+      allow read: if isLoggedIn();
+      allow write: if isAdmin();
+    }
+
+    match /questions/{id} {
+      allow read: if isLoggedIn();
+      allow write: if isAdmin();
+    }
+
+    match /scores/{id} {
+      allow read: if isAdmin() || isLoggedIn();
+      allow create, update: if isAdmin() ||
+        (isLoggedIn() && request.resource.data.nisn + '@siswa.emodul.local' == request.auth.token.email);
+      allow delete: if isAdmin();
+    }
+
+    match /submissions/{id} {
+      allow read: if isAdmin() || isLoggedIn();
+      allow create: if isAdmin() || (
+        isLoggedIn() &&
+        request.resource.data.nisn + '@siswa.emodul.local' == request.auth.token.email &&
+        request.resource.data.dinilai == false
+      );
+      allow update: if isAdmin() || (
+        isLoggedIn() &&
+        request.resource.data.nisn + '@siswa.emodul.local' == request.auth.token.email &&
+        request.resource.data.nilai == resource.data.nilai &&
+        request.resource.data.catatanGuru == resource.data.catatanGuru &&
+        request.resource.data.dinilai == resource.data.dinilai
+      );
+      allow delete: if isAdmin();
+    }
+  }
+}
+--------------------------------------------------------------
+
+Aturan "submissions" di atas sengaja dibuat supaya siswa BOLEH kirim/
+ubah kode tugasnya sendiri, tapi TIDAK BISA mengubah nilai/catatan
+yang sudah diisi guru (field nilai, catatanGuru, dinilai hanya bisa
+diubah lewat akun admin).
+
+Kenapa ini penting: karena aturan versi awal (kalau hanya menebak
+"bukan email siswa = admin") bisa dibobol siapa saja yang tahu cara
+bikin akun baru lewat kode. Aturan di atas mengecek daftar admin yang
+SUDAH kamu daftarkan manual di Langkah 2, jadi jauh lebih aman.
+
+
+LANGKAH 4 — Setelah Waktu Uji Coba Firestore Habis
+------------------------------------
+Kalau saat Langkah "Create database" kamu pilih "Start in test mode",
+itu otomatis kadaluarsa 30 hari dan menutup semua akses. Setelah
+kamu menempel aturan dari Langkah 3, tidak masalah walau test mode
+habis, karena aturan barumu sudah menggantikannya secara permanen.
+
+
+LANGKAH 5 — Alur Pemakaian
+------------------------------------
+1. Kamu (admin) buka online/admin.html, login pakai akun admin.
+2. Tambahkan siswa satu per satu di tab "Siswa" (NISN, nama, kelas,
+   password awal).
+3. Tambahkan soal di tab "Soal" — pilih Pretest, Pertemuan 1/2/3, atau
+   Posttest, lalu isi satu per satu ATAU import sekaligus dari Excel
+   (unduh template dulu di tab yang sama).
+4. Di tab "Pertemuan", buka (unlock) "Pretest" dulu — biarkan yang
+   lain terkunci. Minta siswa kerjakan Pretest sebelum mulai belajar
+   materi Bab 2 (materi dipelajari lewat e-modul offline seperti
+   biasa, tidak lewat sistem online ini).
+5. Setelah siswa selesai Pretest, tutup lagi Pretest, lalu buka
+   Pertemuan 1 sesuai jadwal kelas.
+6. Ulangi pola buka-tutup untuk Pertemuan 2 dan 3.
+7. Setelah semua materi selesai, buka "Posttest".
+8. Cek tab "Nilai" → bagian "Rekap N-Gain" untuk melihat peningkatan
+   nilai tiap siswa (Pretest → Posttest) secara otomatis, lengkap
+   dengan kategori Tinggi/Sedang/Rendah dan rata-rata kelas — bisa
+   langsung diunduh sebagai CSV untuk dilampirkan di skripsi.
+
+CATATAN PRETEST/POSTTEST
+------------------------------------
+- Pretest dan Posttest hanya bisa dikerjakan SATU KALI per siswa
+  (tombol "Kerjakan Lagi" tidak muncul), supaya datanya valid untuk
+  perhitungan N-Gain.
+- Kuis Pertemuan 1/2/3 tetap boleh dikerjakan berkali-kali (sifatnya
+  latihan, bukan alat ukur penelitian).
+
+
+CATATAN
+------------------------------------
+- Bagian online ini WAJIB ada internet (baik untukmu maupun siswa),
+  karena datanya tersimpan di server Firebase, bukan lokal.
+- Password siswa diamankan langsung oleh sistem Firebase Authentication
+  (bukan disimpan sebagai teks biasa).
+- Kalau siswa lupa password, admin bisa reset lewat Firebase Console >
+  Authentication > cari akun (email-nya NISN@siswa.emodul.local) >
+  menu titik tiga > Reset password.

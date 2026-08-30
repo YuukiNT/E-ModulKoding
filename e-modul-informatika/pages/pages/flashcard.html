@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcard Istilah · E-Modul Koding &amp; AI</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/responsive.css">
+<link rel="stylesheet" href="../css/flashcard.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <div class="logo"><span class="emoji">💻</span> E-Modul Koding &amp; AI</div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Beranda</a></li>
+      <li><a href="ice-breaking.html">Ice Breaking</a></li>
+      <li><a href="materi.html">Materi</a></li>
+      <li><a href="mode-sederhana.html">Mode ABK</a></li>
+      <li><a href="coding-lab.html">Coding Lab</a></li>
+      <li><a href="latihan.html">Latihan</a></li>
+      <li><a href="flashcard.html" class="active">Flashcard</a></li>
+      <li><a href="cheat-sheet.html">Cheat Sheet</a></li>
+      <li><a href="detektif-bug.html">Detektif Bug</a></li>
+      <li><a href="kuis.html">Kuis</a></li>
+      <li><a href="evaluasi.html">Progres</a></li>
+    </ul>
+    <div class="nav-tools">
+      <button class="icon-btn" data-theme-toggle aria-label="Ganti tema">🌙</button>
+      <button class="hamburger" aria-label="Buka menu">☰</button>
+    </div>
+  </div>
+</nav>
+
+<section class="section">
+  <div class="container" style="max-width:560px;">
+    <div class="eyebrow">Latihan Ingatan</div>
+    <h2 style="font-size:26px;">🗂️ Flashcard Istilah Bab 2</h2>
+    <p style="color:var(--ink-soft);">Klik kartunya untuk membalik dan lihat artinya. Tandai "Sudah Hafal" kalau kamu yakin, atau "Masih Belajar" kalau perlu diulang lagi.</p>
+
+    <div class="fc-stats">
+      <span>Kartu <strong id="fcPosisi">1</strong> / <span id="fcTotal">1</span></span>
+      <span>Sudah hafal: <strong id="fcHafalCount">0</strong></span>
+    </div>
+    <div class="fc-progress-track"><div class="fc-progress-fill" id="fcProgressFill" style="width:0%"></div></div>
+
+    <div class="fc-scene" id="fcScene">
+      <div class="fc-card" id="fcCard">
+        <div class="fc-face fc-front">
+          <span class="fc-tag" id="fcTagFront">ISTILAH</span>
+          <div class="fc-term" id="fcTerm">Nested If</div>
+          <span class="fc-hint">Klik untuk lihat artinya ↺</span>
+        </div>
+        <div class="fc-face fc-back">
+          <span class="fc-tag">ARTI</span>
+          <div class="fc-def" id="fcDef">...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fc-actions">
+      <button class="btn ghost" id="fcPrev">← Sebelumnya</button>
+      <button class="btn sm" id="fcShuffle">🔀 Acak</button>
+      <button class="btn ghost" id="fcNext">Berikutnya →</button>
+    </div>
+
+    <div class="fc-mark-row">
+      <button class="btn sm" style="background:var(--bad);" id="fcBelum">😅 Masih Belajar</button>
+      <button class="btn sm" style="background:var(--ok);" id="fcHafal">✅ Sudah Hafal</button>
+    </div>
+
+    <div style="text-align:center; margin-top:30px;">
+      <button class="btn ghost sm" id="fcReset">↻ Reset Progres Hafalan</button>
+    </div>
+  </div>
+</section>
+
+<footer>E-Modul Koding dan Artifisial Intelijen · Bab 2 · SMP Negeri 9 Samarinda</footer>
+<button class="back-top" aria-label="Kembali ke atas">↑</button>
+
+<script src="../js/main.js"></script>
+<script src="../js/flashcard.js"></script>
+</body>
+</html>

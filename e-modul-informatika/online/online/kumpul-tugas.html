@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kumpul Tugas Koding · Bab 2</title>
+<link rel="stylesheet" href="css/online.css">
+<link rel="stylesheet" href="css/compiler-online.css">
+</head>
+<body>
+
+<div class="on-topbar">
+  <div class="brand">📤 Kumpul Tugas Koding</div>
+  <div class="who">
+    <a href="kuis-online.html" style="color:#fff; opacity:.9; font-size:13px; margin-right:4px;">🎓 Kuis Online</a>
+    <span id="whoText">Memuat...</span>
+    <button id="btnLogout">Keluar</button>
+  </div>
+</div>
+
+<div class="on-main">
+
+  <!-- DASHBOARD TUGAS -->
+  <div id="dashboardView">
+    <h2 style="margin-bottom:4px;">Tugas Koding — Bab 2</h2>
+    <p style="color:var(--on-ink-soft); margin-top:0;">Kerjakan tantangan koding-nya, uji dulu kodemu, baru kumpulkan ke guru.</p>
+    <div class="pert-grid" id="tugasGrid"></div>
+  </div>
+
+  <!-- EDITOR VIEW -->
+  <div id="editorView" style="display:none;">
+    <button class="on-btn secondary sm" id="btnBackDash" style="margin-bottom:18px; width:auto;">← Kembali ke Daftar Tugas</button>
+
+    <div class="on-panel-card">
+      <h3 id="tugasJudul">Tantangan</h3>
+      <p id="tugasDeskripsi" style="color:var(--on-ink-soft); font-size:14px;"></p>
+    </div>
+
+    <div class="lab-grid">
+      <div class="lab-panel">
+        <div class="panel-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>&nbsp;kodemu.py</div>
+        <div class="editor-wrap">
+          <div class="line-numbers" id="lineNumbers">1</div>
+          <textarea id="codeEditor" spellcheck="false"></textarea>
+        </div>
+      </div>
+      <div class="lab-panel">
+        <div class="panel-bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>&nbsp;output</div>
+        <div class="output-area" id="outputArea"><span class="out-empty">(Belum ada output. Klik Jalankan untuk mencoba kodemu.)</span></div>
+        <div class="lab-actions">
+          <button class="on-btn accent" id="btnRun" style="width:auto;">▶ Jalankan</button>
+          <button class="on-btn secondary" id="btnClearOut" style="width:auto;">🧹 Bersihkan</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="on-panel-card">
+      <div class="on-error" id="submitError"></div>
+      <div class="on-success" id="submitSuccess">Tugas berhasil dikumpulkan ✅</div>
+      <button class="on-btn accent" id="btnSubmitTugas" style="width:auto; padding:12px 26px;">📤 Kumpulkan Tugas Ini</button>
+      <p style="font-size:12.5px; color:var(--on-ink-soft); margin-top:10px;" id="submissionStatus"></p>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast-on" id="toastOn"></div>
+
+<script src="../assets/js/skulpt/skulpt.min.js"></script>
+<script src="../assets/js/skulpt/skulpt-stdlib.js"></script>
+<script type="module">
+  import {
+    auth, db, onAuthStateChanged, signOut, STUDENT_EMAIL_DOMAIN,
+    doc, getDoc, setDoc, serverTimestamp
+  } from "./js/firebase-init.js";
+
+  const TUGAS_LIST = [
+    {
+      id:'tantangan1', title:'Tantangan 1', sub:'Fungsi Konversi Suhu (Pertemuan 1)',
+      deskripsi:'Buat fungsi fahrenheit_ke_kelvin(f) yang mengonversi Fahrenheit ke Kelvin, lalu uji dengan beberapa nilai berbeda.',
+      starter:'def fahrenheit_ke_kelvin(f):\n    # tulis kodemu di sini\n    pass\n\nprint(fahrenheit_ke_kelvin(98.6))'
+    },
+    {
+      id:'tantangan2', title:'Tantangan 2', sub:'Kasir Cerdas + Antrean FIFO (Pertemuan 2)',
+      deskripsi:'Gabungkan program Kasir Cerdas dengan simulasi Antrean FIFO: setiap pelanggan dalam antrean dihitung poinnya berdasarkan total belanja masing-masing.',
+      starter:'# Gabungkan Kasir Cerdas + Antrean FIFO di sini\nantrean = []\n\n'
+    },
+    {
+      id:'tantangan3', title:'Tantangan 3', sub:'Try-Except pada Kasir Cerdas (Pertemuan 3)',
+      deskripsi:'Ambil program Kasir Cerdas dari Pertemuan 2, lalu tambahkan blok try-except supaya program tidak error kalau pengguna memasukkan huruf, bukan angka.',
+      starter:'try:\n    total = int(input("Total belanja: "))\n    # lanjutkan logikanya di sini\nexcept:\n    print("Input harus berupa angka!")'
+    },
+  ];
+
+  let currentStudent = null;
+  let currentSubmissions = {};
+  let activeTugas = null;
+
+  function showToast(msg){
+    const t = document.getElementById('toastOn');
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(()=>t.classList.remove('show'), 2600);
+  }
+  function friendlyError(err){
+    console.error(err);
+    if(err.code === 'permission-denied' || (err.message && err.message.includes('permission'))){
+      return '⛔ Akses ditolak sistem. Coba logout lalu login lagi, atau minta guru cek Firestore Rules (perlu tambahan aturan untuk koleksi "submissions").';
+    }
+    return '⚠️ Terjadi kesalahan: ' + (err.message || err);
+  }
+
+  onAuthStateChanged(auth, async (user) => {
+    if(!user || !user.email || !user.email.endsWith('@' + STUDENT_EMAIL_DOMAIN)){
+      window.location.href = 'login.html';
+      return;
+    }
+    const nisn = user.email.replace('@' + STUDENT_EMAIL_DOMAIN, '');
+    try{
+      const studentDoc = await getDoc(doc(db, 'students', nisn));
+      if(!studentDoc.exists()){ showToast('Data siswa tidak ditemukan.'); return; }
+      currentStudent = { nisn, ...studentDoc.data() };
+      document.getElementById('whoText').textContent = currentStudent.nama + ' · ' + (currentStudent.kelas || '');
+
+      for(const t of TUGAS_LIST){
+        const snap = await getDoc(doc(db, 'submissions', nisn + '_' + t.id));
+        if(snap.exists()) currentSubmissions[t.id] = snap.data();
+      }
+      renderDashboard();
+    }catch(err){
+      showToast(friendlyError(err));
+    }
+  });
+
+  document.getElementById('btnLogout').addEventListener('click', async () => {
+    await signOut(auth);
+    window.location.href = 'login.html';
+  });
+
+  function renderDashboard(){
+    document.getElementById('dashboardView').style.display = 'block';
+    document.getElementById('editorView').style.display = 'none';
+    const grid = document.getElementById('tugasGrid');
+    grid.innerHTML = '';
+    TUGAS_LIST.forEach(t => {
+      const sub = currentSubmissions[t.id];
+      let statusHtml, actionHtml;
+      if(!sub){
+        statusHtml = '<div class="status unlocked">📝 Belum Dikerjakan</div>';
+        actionHtml = '<button class="on-btn sm" data-open="'+t.id+'" style="width:auto; padding:10px 20px; margin-top:10px;">Mulai Kerjakan</button>';
+      } else if(sub.dinilai){
+        statusHtml = '<div class="status done">✅ Sudah Dinilai</div>';
+        actionHtml = `<div class="score">${sub.nilai}</div>${sub.catatanGuru ? '<p style="font-size:12.5px;">💬 '+escapeHtml(sub.catatanGuru)+'</p>' : ''}<button class="on-btn secondary sm" data-open="${t.id}" style="width:auto;">Lihat / Revisi</button>`;
+      } else {
+        statusHtml = '<div class="status unlocked">📬 Terkumpul, Menunggu Dinilai</div>';
+        actionHtml = '<button class="on-btn secondary sm" data-open="'+t.id+'" style="width:auto;">Lihat / Ubah</button>';
+      }
+      const card = document.createElement('div');
+      card.className = 'pert-card';
+      card.innerHTML = `${statusHtml}<h3>${t.title}</h3><p style="margin-top:-4px;">${t.sub}</p>${actionHtml}`;
+      grid.appendChild(card);
+    });
+    grid.querySelectorAll('[data-open]').forEach(btn => {
+      btn.addEventListener('click', () => openEditor(btn.dataset.open));
+    });
+  }
+
+  function openEditor(tugasId){
+    activeTugas = TUGAS_LIST.find(t => t.id === tugasId);
+    const sub = currentSubmissions[tugasId];
+    document.getElementById('dashboardView').style.display = 'none';
+    document.getElementById('editorView').style.display = 'block';
+    document.getElementById('tugasJudul').textContent = activeTugas.title + ' — ' + activeTugas.sub;
+    document.getElementById('tugasDeskripsi').textContent = activeTugas.deskripsi;
+    document.getElementById('codeEditor').value = sub ? sub.kode : activeTugas.starter;
+    document.getElementById('outputArea').innerHTML = '<span class="out-empty">(Belum ada output. Klik Jalankan untuk mencoba kodemu.)</span>';
+    document.getElementById('submitError').classList.remove('show');
+    document.getElementById('submitSuccess').classList.remove('show');
+    document.getElementById('submissionStatus').textContent = sub
+      ? (sub.dinilai ? `Sudah dinilai: ${sub.nilai}` : 'Sudah dikumpulkan, menunggu dinilai guru. Kamu masih boleh mengubah & mengumpulkan ulang.')
+      : 'Belum pernah dikumpulkan.';
+    renderLineNumbers();
+  }
+
+  document.getElementById('btnBackDash').addEventListener('click', renderDashboard);
+
+  /* ===== Editor & Skulpt runner ===== */
+  function renderLineNumbers(){
+    const editor = document.getElementById('codeEditor');
+    const nums = document.getElementById('lineNumbers');
+    const count = editor.value.split('\n').length;
+    let out = ''; for(let i=1;i<=count;i++) out += i+'\n';
+    nums.textContent = out;
+  }
+  document.getElementById('codeEditor').addEventListener('input', renderLineNumbers);
+  document.getElementById('codeEditor').addEventListener('scroll', function(){
+    document.getElementById('lineNumbers').scrollTop = this.scrollTop;
+  });
+  document.getElementById('codeEditor').addEventListener('keydown', (e) => {
+    if(e.key === 'Tab'){
+      e.preventDefault();
+      const editor = e.target;
+      const start = editor.selectionStart, end = editor.selectionEnd;
+      editor.value = editor.value.substring(0,start) + '    ' + editor.value.substring(end);
+      editor.selectionStart = editor.selectionEnd = start+4;
+      renderLineNumbers();
+    }
+  });
+
+  function outputLine(text, cls){
+    const output = document.getElementById('outputArea');
+    const line = document.createElement('div');
+    if(cls) line.className = cls;
+    line.textContent = text;
+    output.appendChild(line);
+    output.scrollTop = output.scrollHeight;
+  }
+  function skBuiltinRead(x){
+    if(Sk.builtinFiles === undefined || Sk.builtinFiles['files'][x] === undefined) throw 'File tidak ditemukan: "' + x + '"';
+    return Sk.builtinFiles['files'][x];
+  }
+  document.getElementById('btnRun').addEventListener('click', () => {
+    const output = document.getElementById('outputArea');
+    output.innerHTML = '';
+    let buffered = '';
+    Sk.configure({
+      output: (t) => { buffered += t; },
+      read: skBuiltinRead,
+      inputfun: (p) => window.prompt(p || 'Masukkan nilai:') || '',
+      inputfunTakesPrompt: true,
+      __future__: Sk.python3
+    });
+    Sk.misceval.asyncToPromise(() => Sk.importMainWithBody('<stdin>', false, document.getElementById('codeEditor').value, true))
+      .then(() => {
+        if(buffered) buffered.split('\n').forEach((l,i,a) => { if(l.length || i<a.length-1) outputLine(l,'out-log'); });
+        if(output.children.length === 0) outputLine('(Tidak ada output. Gunakan print() untuk menampilkan sesuatu.)', 'out-empty');
+      }, (err) => {
+        if(buffered) buffered.split('\n').forEach((l,i,a) => { if(l.length || i<a.length-1) outputLine(l,'out-log'); });
+        outputLine('⚠️ ' + err.toString(), 'out-error');
+      });
+  });
+  document.getElementById('btnClearOut').addEventListener('click', () => {
+    document.getElementById('outputArea').innerHTML = '<span class="out-empty">(Output dikosongkan.)</span>';
+  });
+
+  /* ===== Submit tugas ===== */
+  document.getElementById('btnSubmitTugas').addEventListener('click', async () => {
+    const kode = document.getElementById('codeEditor').value;
+    if(!kode.trim()){
+      const errBox = document.getElementById('submitError');
+      errBox.textContent = 'Kodenya masih kosong.';
+      errBox.classList.add('show');
+      return;
+    }
+    const btn = document.getElementById('btnSubmitTugas');
+    btn.disabled = true; btn.textContent = 'Mengumpulkan...';
+    try{
+      const existing = currentSubmissions[activeTugas.id];
+      await setDoc(doc(db, 'submissions', currentStudent.nisn + '_' + activeTugas.id), {
+        nisn: currentStudent.nisn,
+        nama: currentStudent.nama,
+        kelas: currentStudent.kelas || '',
+        tugas: activeTugas.id,
+        kode,
+        waktu: serverTimestamp(),
+        nilai: existing ? existing.nilai ?? null : null,
+        catatanGuru: existing ? existing.catatanGuru ?? null : null,
+        dinilai: existing ? existing.dinilai ?? false : false
+      });
+      currentSubmissions[activeTugas.id] = { ...(currentSubmissions[activeTugas.id]||{}), kode, tugas: activeTugas.id };
+      document.getElementById('submitError').classList.remove('show');
+      document.getElementById('submitSuccess').classList.add('show');
+      document.getElementById('submissionStatus').textContent = 'Sudah dikumpulkan, menunggu dinilai guru.';
+      setTimeout(() => document.getElementById('submitSuccess').classList.remove('show'), 2500);
+    }catch(err){
+      const errBox = document.getElementById('submitError');
+      errBox.textContent = friendlyError(err);
+      errBox.classList.add('show');
+    }
+    btn.disabled = false; btn.textContent = '📤 Kumpulkan Tugas Ini';
+  });
+
+  function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>

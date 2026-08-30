@@ -1,0 +1,25 @@
+@media (max-width:860px){
+  .card-grid{grid-template-columns:repeat(2,1fr);}
+  .hamburger{display:block;}
+  .nav-links{
+    position:fixed; top:64px; left:0; right:0; background:var(--surface);
+    flex-direction:column; align-items:stretch; padding:10px 16px; gap:2px;
+    border-bottom:1px solid var(--border); box-shadow:var(--shadow-lg);
+    transform:translateY(-8px); opacity:0; pointer-events:none; transition:.18s;
+    max-height:calc(100vh - 74px); overflow-y:auto;
+  }
+  .nav-links.open{transform:translateY(0); opacity:1; pointer-events:auto;}
+  .nav-links a{padding:12px 10px; border-radius:8px;}
+}
+@media (max-width:600px){
+  .hero{padding:44px 0 36px 0;}
+  .section{padding:32px 0;}
+  .quiz-nav{flex-wrap:wrap;}
+  .card-grid{grid-template-columns:1fr;}
+  .fc-actions{flex-wrap:wrap; justify-content:center;}
+  .fc-mark-row{flex-wrap:wrap;}
+  .ms-flashrow:not(.ms-flashrow-vert){flex-direction:column;}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none !important; transition:none !important;}
+}

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Siswa · Kuis Online Bab 2</title>
+<link rel="stylesheet" href="css/online.css">
+</head>
+<body>
+
+<div class="on-center">
+  <div class="on-card">
+    <div class="icon">🎓</div>
+    <h1>Login Kuis Online</h1>
+    <p class="sub">Koding dan Artifisial Intelijen · Bab 2</p>
+
+    <div class="on-error" id="loginError"></div>
+
+    <form id="loginForm">
+      <div class="on-field">
+        <label for="nisn">Nomor Absen / NISN</label>
+        <input type="text" id="nisn" inputmode="numeric" placeholder="Contoh: 12345678" required>
+      </div>
+      <div class="on-field">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Password dari guru" required>
+      </div>
+      <button type="submit" class="on-btn" id="btnLogin">Masuk</button>
+    </form>
+
+    <p style="text-align:center; font-size:12.5px; color:var(--on-ink-soft); margin-top:18px;">
+      Lupa password? Hubungi gurumu untuk mengatur ulang.
+    </p>
+  </div>
+</div>
+
+<script type="module">
+  import { auth, signInWithEmailAndPassword, STUDENT_EMAIL_DOMAIN, persistenceReady } from "./js/firebase-init.js";
+
+  const form = document.getElementById('loginForm');
+  const errorBox = document.getElementById('loginError');
+  const btn = document.getElementById('btnLogin');
+
+  // Jika sudah login sebelumnya, langsung lempar ke dashboard.
+  if(sessionStorage.getItem('emodul_student_nisn')){
+    window.location.href = 'kuis-online.html';
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorBox.classList.remove('show');
+    const nisn = document.getElementById('nisn').value.trim();
+    const password = document.getElementById('password').value;
+    if(!nisn || !password){ return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Memeriksa...';
+
+    const email = nisn + '@' + STUDENT_EMAIL_DOMAIN;
+    try{
+      await persistenceReady;
+      await signInWithEmailAndPassword(auth, email, password);
+      sessionStorage.setItem('emodul_student_nisn', nisn);
+      window.location.href = 'kuis-online.html';
+    }catch(err){
+      let pesan = 'NISN atau password salah. Coba lagi.';
+      if(err.code === 'auth/too-many-requests') pesan = 'Terlalu banyak percobaan gagal. Tunggu sebentar lalu coba lagi.';
+      if(err.code === 'auth/user-disabled') pesan = 'Akun ini dinonaktifkan. Hubungi guru.';
+      errorBox.textContent = pesan;
+      errorBox.classList.add('show');
+      btn.disabled = false;
+      btn.textContent = 'Masuk';
+    }
+  });
+</script>
+</body>
+</html>

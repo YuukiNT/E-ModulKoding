@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Progres Belajar · E-Modul Koding &amp; AI</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <div class="logo"><span class="emoji">💻</span> E-Modul Koding &amp; AI</div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Beranda</a></li>
+      <li><a href="ice-breaking.html">Ice Breaking</a></li>
+      <li><a href="materi.html">Materi</a></li>
+      <li><a href="mode-sederhana.html">Mode ABK</a></li>
+      <li><a href="coding-lab.html">Coding Lab</a></li>
+      <li><a href="latihan.html">Latihan</a></li>
+      <li><a href="flashcard.html">Flashcard</a></li>
+      <li><a href="cheat-sheet.html">Cheat Sheet</a></li>
+      <li><a href="detektif-bug.html">Detektif Bug</a></li>
+      <li><a href="kuis.html">Kuis</a></li>
+      <li><a href="evaluasi.html" class="active">Progres</a></li>
+    </ul>
+    <div class="nav-tools">
+      <button class="icon-btn" data-theme-toggle aria-label="Ganti tema">🌙</button>
+      <button class="hamburger" aria-label="Buka menu">☰</button>
+    </div>
+  </div>
+</nav>
+
+<section class="section">
+  <div class="container" style="max-width:640px;">
+    <div class="eyebrow">Ringkasan Belajarmu</div>
+    <h2 style="font-size:26px;">Progres Belajar</h2>
+    <p style="color:var(--ink-soft);">Progres dihitung dari bab yang sudah kamu tandai selesai (60%) dan nilai kuis terakhir (40%). Tersimpan otomatis di perangkat ini.</p>
+
+    <div class="card" style="margin-top:10px;">
+      <div id="progressDetail"></div>
+    </div>
+
+    <div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
+      <a href="materi.html" class="btn ghost">Lanjut Belajar Materi</a>
+      <a href="kuis.html" class="btn">Kerjakan / Ulangi Kuis</a>
+      <button class="btn ghost" id="btnResetProgress" style="border-color:var(--bad); color:var(--bad);">Reset Progres</button>
+    </div>
+  </div>
+</section>
+
+<div class="modal-backdrop" id="confirmModal">
+  <div class="modal">
+    <h3>Reset semua progres?</h3>
+    <p>Status bab selesai, nilai kuis, dan latihan yang tersimpan di perangkat ini akan dihapus. Tindakan ini tidak bisa dibatalkan.</p>
+    <div class="modal-actions">
+      <button class="btn ghost" id="btnCancelReset">Batal</button>
+      <button class="btn" style="background:var(--bad);" id="btnConfirmReset">Ya, Reset</button>
+    </div>
+  </div>
+</div>
+
+<footer>E-Modul Koding dan Artifisial Intelijen · Bab 2 · SMP Negeri 9 Samarinda</footer>
+<button class="back-top" aria-label="Kembali ke atas">↑</button>
+
+<script src="../js/main.js"></script>
+<script src="../js/progress.js"></script>
+<script>
+  renderProgressBars('#progressDetail');
+
+  const modal = document.getElementById('confirmModal');
+  document.getElementById('btnResetProgress').addEventListener('click', () => modal.classList.add('show'));
+  document.getElementById('btnCancelReset').addEventListener('click', () => modal.classList.remove('show'));
+  document.getElementById('btnConfirmReset').addEventListener('click', () => {
+    localStorage.removeItem('emodul_progress_v1');
+    modal.classList.remove('show');
+    renderProgressBars('#progressDetail');
+    showToast('Progres berhasil direset.');
+  });
+</script>
+</body>
+</html>

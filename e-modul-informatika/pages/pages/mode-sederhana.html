@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mode Sederhana · E-Modul Koding &amp; AI</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/responsive.css">
+<link rel="stylesheet" href="../css/mode-sederhana.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <div class="logo"><span class="emoji">💻</span> E-Modul Koding &amp; AI</div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Beranda</a></li>
+      <li><a href="ice-breaking.html">Ice Breaking</a></li>
+      <li><a href="materi.html">Materi</a></li>
+      <li><a href="mode-sederhana.html" class="active">Mode ABK</a></li>
+      <li><a href="coding-lab.html">Coding Lab</a></li>
+      <li><a href="latihan.html">Latihan</a></li>
+      <li><a href="flashcard.html">Flashcard</a></li>
+      <li><a href="cheat-sheet.html">Cheat Sheet</a></li>
+      <li><a href="detektif-bug.html">Detektif Bug</a></li>
+      <li><a href="kuis.html">Kuis</a></li>
+      <li><a href="evaluasi.html">Progres</a></li>
+    </ul>
+    <div class="nav-tools">
+      <button class="icon-btn" data-theme-toggle aria-label="Ganti tema">🌙</button>
+      <button class="hamburger" aria-label="Buka menu">☰</button>
+    </div>
+  </div>
+</nav>
+
+<div class="ms-wrap">
+  <div class="ms-hero">
+    <div class="ms-kicker">🧩 Versi Lebih Sederhana</div>
+    <h1>Mode Sederhana — Bab 2</h1>
+    <p>Halaman ini pakai bahasa yang lebih ringkas, langkah lebih kecil, dan kode isian rumpang (tinggal lengkapi bagian kosongnya). Cocok kalau kamu ingin belajar pelan-pelan dulu sebelum ke materi lengkap.</p>
+    <a href="materi.html" class="ms-link-back">← Lihat materi versi lengkap</a>
+  </div>
+
+  <div class="ms-main">
+
+    <!-- PERTEMUAN 1 SEDERHANA -->
+    <div class="ms-card">
+      <div class="ms-badge">PERTEMUAN 1</div>
+      <h2>🧠 Mengenal Alur "Jika — Maka"</h2>
+      <p class="ms-text">Komputer bisa membuat keputusan, sama seperti kita. Contoh: <strong>"Jika</strong> hujan, <strong>maka</strong> bawa payung."</p>
+
+      <div class="ms-flashrow">
+        <div class="ms-flash">☔<span>Hujan?</span></div>
+        <div class="ms-flash-arrow">→</div>
+        <div class="ms-flash">☂️<span>Bawa Payung</span></div>
+      </div>
+
+      <p class="ms-text">Kadang ada <strong>dua</strong> pertanyaan "jika" yang harus dijawab berurutan, seperti tangga:</p>
+      <div class="ms-flashrow ms-flashrow-vert">
+        <div class="ms-flash-step">1️⃣ Tinggi badan cukup?</div>
+        <div class="ms-flash-step">2️⃣ Punya tiket?</div>
+        <div class="ms-flash-step ms-flash-result">✅ Boleh naik wahana!</div>
+      </div>
+
+      <h3 class="ms-sub">💻 Kode Rumpang — Lengkapi Titik-titiknya</h3>
+      <p class="ms-text">Ini kode Python yang belum lengkap. Isi bagian bertitik-titik sesuai contoh di atas:</p>
+      <pre class="ms-code">tinggi = 130
+punya_tiket = True
+
+if tinggi >= 120:
+    if ______________:
+        print("Boleh naik wahana!")
+    else:
+        print("Beli tiket dulu.")
+else:
+    print("Tinggi belum cukup.")</pre>
+      <p class="ms-hint">💡 Petunjuk: isi titik-titik dengan nama variabel yang mengecek soal tiket.</p>
+
+      <h3 class="ms-sub">✏️ Tugas Sederhana</h3>
+      <p class="ms-text">Buat 2-3 baris kode Python yang menampilkan: nama kamu, kelas kamu, dan sekolah kamu. Pakai <code>print()</code> tiga kali.</p>
+
+      <div class="ms-refleksi-row">
+        <button class="btn sm" data-selesai-ms="p1">✅ Tandai Sudah Dipelajari</button>
+      </div>
+    </div>
+
+    <!-- PERTEMUAN 2 SEDERHANA -->
+    <div class="ms-card">
+      <div class="ms-badge">PERTEMUAN 2</div>
+      <h2>🛒 Kasir Cerdas Versi Simpel</h2>
+      <p class="ms-text">Toko kasih poin belanja. Makin besar belanja, makin banyak poinnya. Ini aturannya:</p>
+
+      <table class="ms-table">
+        <tr><th>Belanja</th><th>Poin</th></tr>
+        <tr><td>Lebih dari Rp500.000</td><td>⭐⭐⭐⭐⭐ (5 poin)</td></tr>
+        <tr><td>Lebih dari Rp300.000</td><td>⭐⭐⭐ (3 poin)</td></tr>
+        <tr><td>Lebih dari Rp100.000</td><td>⭐⭐ (2 poin)</td></tr>
+      </table>
+
+      <h3 class="ms-sub">💻 Kode Rumpang</h3>
+      <pre class="ms-code">total = 600000
+poin = 0
+
+if total > 500000:
+    poin = ______
+elif total > 300000:
+    poin = 3
+elif total > 100000:
+    poin = 2
+
+print("Poin:", poin)</pre>
+      <p class="ms-hint">💡 Petunjuk: lihat tabel di atas, isi titik-titik dengan angka poin yang sesuai.</p>
+
+      <h3 class="ms-sub">✏️ Tugas Sederhana</h3>
+      <p class="ms-text">Ganti angka <code>total = 600000</code> jadi angka lain (misalnya 150000), lalu tebak dulu poinnya sebelum dijalankan.</p>
+
+      <div class="ms-refleksi-row">
+        <button class="btn sm" data-selesai-ms="p2">✅ Tandai Sudah Dipelajari</button>
+      </div>
+    </div>
+
+    <!-- PERTEMUAN 3 SEDERHANA -->
+    <div class="ms-card">
+      <div class="ms-badge">PERTEMUAN 3</div>
+      <h2>🐛 Jadi Detektif Bug</h2>
+      <p class="ms-text">"Bug" itu kesalahan dalam program — bukan serangga beneran! Ada 3 jenisnya:</p>
+
+      <div class="ms-bugrow">
+        <div class="ms-bugcard">🧩<strong>Salah Tulis</strong><span>Lupa titik dua, lupa kurung</span></div>
+        <div class="ms-bugcard">⚠️<strong>Berhenti Tiba-tiba</strong><span>Program macet di tengah</span></div>
+        <div class="ms-bugcard">🧠<strong>Hasil Salah</strong><span>Jalan lancar, tapi salah</span></div>
+      </div>
+
+      <h3 class="ms-sub">🔍 Latihan: Temukan yang Salah</h3>
+      <p class="ms-text">Kode di bawah ini ada yang kurang. Coba tebak apa yang hilang!</p>
+      <pre class="ms-code">if nilai >= 75
+    print("Lulus")</pre>
+      <p class="ms-hint">💡 Petunjuk: bandingkan dengan kode yang benar di Pertemuan 1 — ada tanda baca yang hilang di akhir baris pertama.</p>
+
+      <h3 class="ms-sub">✏️ Tugas Sederhana</h3>
+      <p class="ms-text">Tulis ulang kode di atas dengan benar (tambahkan tanda yang hilang), lalu coba jalankan di Coding Lab.</p>
+
+      <div class="ms-refleksi-row">
+        <button class="btn sm" data-selesai-ms="p3">✅ Tandai Sudah Dipelajari</button>
+      </div>
+    </div>
+
+    <div class="ms-nav-links">
+      <a href="coding-lab.html" class="btn accent">💻 Coba di Coding Lab</a>
+      <a href="flashcard.html" class="btn ghost">🗂️ Latihan Flashcard</a>
+      <a href="materi.html" class="btn ghost">📖 Lihat Materi Lengkap</a>
+    </div>
+  </div>
+</div>
+
+<footer>E-Modul Koding dan Artifisial Intelijen · Bab 2 · SMP Negeri 9 Samarinda</footer>
+<button class="back-top" aria-label="Kembali ke atas">↑</button>
+
+<script src="../js/main.js"></script>
+<script src="../js/progress.js"></script>
+<script>
+  document.querySelectorAll('[data-selesai-ms]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      setBabSelesai(btn.dataset.selesaiMs);
+      showToast('Ditandai sudah dipelajari 🎉');
+    });
+  });
+</script>
+</body>
+</html>

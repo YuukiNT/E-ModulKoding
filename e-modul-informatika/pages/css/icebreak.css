@@ -1,0 +1,90 @@
+/* icebreak.css — tema ceria & energik untuk pembuka kelas, beda nuansa dari halaman lain */
+.ib-wrap{
+  background:
+    radial-gradient(circle at 10% 10%, rgba(255,209,102,.25), transparent 45%),
+    radial-gradient(circle at 90% 0%, rgba(255,93,162,.18), transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(51,224,200,.15), transparent 45%),
+    #fff9f0;
+  margin:-1px 0 0 0;
+}
+:root[data-theme="dark"] .ib-wrap{
+  background:
+    radial-gradient(circle at 10% 10%, rgba(255,209,102,.10), transparent 45%),
+    radial-gradient(circle at 90% 0%, rgba(255,93,162,.10), transparent 40%),
+    #161022;
+}
+.ib-hero{text-align:center; padding:54px 20px 28px 20px; max-width:640px; margin:0 auto;}
+.ib-hero .kicker{font-family:"SFMono-Regular", Consolas, monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:#e07b39;}
+.ib-hero h1{font-family:"Trebuchet MS", sans-serif; font-size:clamp(26px,4.5vw,36px); margin:12px 0;}
+.ib-hero p{color:var(--ink-soft); font-size:15px;}
+
+.ib-main{max-width:680px; margin:0 auto; padding:10px 20px 60px 20px;}
+
+.ib-card{
+  background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:26px 24px;
+  margin:22px 0; box-shadow:0 6px 24px rgba(28,39,51,.08); position:relative; overflow:hidden;
+}
+.ib-card .ib-num{
+  position:absolute; top:-14px; right:-6px; font-family:"Trebuchet MS", sans-serif; font-weight:800;
+  font-size:74px; color:rgba(224,123,57,.08);
+}
+.ib-card h3{font-family:"Trebuchet MS", sans-serif; font-size:19px; margin:0 0 6px 0; display:flex; align-items:center; gap:8px;}
+.ib-card .desc{color:var(--ink-soft); font-size:14px; margin-bottom:18px;}
+
+/* Mesin Ajaib */
+.mesin-row{display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; margin:18px 0;}
+.mesin-box{
+  width:110px; height:90px; border-radius:16px; background:linear-gradient(160deg, #3355d9, #233b9e);
+  display:flex; align-items:center; justify-content:center; font-size:34px; color:#fff; position:relative;
+  box-shadow:0 8px 20px rgba(51,85,217,.3);
+}
+.mesin-box.spin{animation:mesinSpin .8s ease;}
+@keyframes mesinSpin{ 0%{transform:scale(1) rotate(0deg);} 50%{transform:scale(1.08) rotate(6deg);} 100%{transform:scale(1) rotate(0deg);} }
+.mesin-arrow{font-size:22px; color:var(--ink-soft);}
+.mesin-slot{
+  width:90px; height:70px; border-radius:14px; background:var(--bg); border:2px dashed var(--border);
+  display:flex; align-items:center; justify-content:center; font-size:30px;
+}
+.ib-select-row{display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:16px;}
+.ib-select-row button{
+  background:var(--bg); border:1.5px solid var(--border); border-radius:12px; padding:10px 14px;
+  font-size:22px; cursor:pointer;
+}
+.ib-select-row button:hover{border-color:#e07b39;}
+.ib-select-row button.picked{border-color:#3355d9; background:rgba(51,85,217,.08);}
+
+/* Roda Pertanyaan */
+.ib-question-box{
+  background:linear-gradient(135deg, #ffe9c7, #ffd9ec); border-radius:16px; padding:22px; text-align:center;
+  font-family:"Trebuchet MS", sans-serif; font-size:16.5px; font-weight:700; color:#3a2a10; min-height:70px;
+  display:flex; align-items:center; justify-content:center;
+}
+:root[data-theme="dark"] .ib-question-box{background:linear-gradient(135deg, #4a3418, #4a1f38); color:#ffe9c7;}
+.ib-question-box.pop{animation:ibPop .35s ease;}
+@keyframes ibPop{ 0%{transform:scale(.92); opacity:.3;} 100%{transform:scale(1); opacity:1;} }
+
+/* Tebak Emoji */
+.ib-emoji-display{
+  font-size:44px; text-align:center; background:var(--bg); border-radius:16px; padding:26px; margin:14px 0;
+}
+.ib-emoji-opts{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:14px;}
+.ib-emoji-opts button{
+  background:var(--surface); border:1.5px solid var(--border); border-radius:10px; padding:11px 6px;
+  font-size:13px; cursor:pointer; font-weight:600;
+}
+.ib-emoji-opts button:hover{border-color:#e07b39;}
+.ib-emoji-opts button.correct{background:rgba(74,222,128,.15); border-color:#4ade80;}
+.ib-emoji-opts button.wrong{background:rgba(227,86,74,.15); border-color:#e3564a;}
+
+.ib-btn{
+  font-family:"Trebuchet MS", sans-serif; font-weight:700; font-size:13.5px; border:none; border-radius:24px;
+  padding:11px 22px; cursor:pointer; background:#e07b39; color:#fff; margin-top:16px;
+}
+.ib-btn:hover{filter:brightness(1.06);}
+.ib-btn.blue{background:#3355d9;}
+
+.ib-tally{font-family:"SFMono-Regular", Consolas, monospace; font-size:12.5px; color:var(--ink-soft); text-align:center; margin-top:10px;}
+
+@media (max-width:480px){
+  .ib-emoji-opts{grid-template-columns:repeat(2,1fr);}
+}

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detektif Debugging · E-Modul Koding &amp; AI</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/detektif.css">
+<link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-inner">
+    <div class="logo"><span class="emoji">💻</span> E-Modul Koding &amp; AI</div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Beranda</a></li>
+      <li><a href="ice-breaking.html">Ice Breaking</a></li>
+      <li><a href="materi.html">Materi</a></li>
+      <li><a href="mode-sederhana.html">Mode ABK</a></li>
+      <li><a href="coding-lab.html">Coding Lab</a></li>
+      <li><a href="latihan.html">Latihan</a></li>
+      <li><a href="flashcard.html">Flashcard</a></li>
+      <li><a href="cheat-sheet.html">Cheat Sheet</a></li>
+      <li><a href="detektif-bug.html" class="active">Detektif Bug</a></li>
+      <li><a href="kuis.html">Kuis</a></li>
+      <li><a href="evaluasi.html">Progres</a></li>
+    </ul>
+    <div class="nav-tools">
+      <button class="icon-btn" data-theme-toggle aria-label="Ganti tema">🌙</button>
+      <button class="hamburger" aria-label="Buka menu">☰</button>
+    </div>
+  </div>
+</nav>
+
+<div class="det-wrap">
+  <div class="det-toast" id="detToast"></div>
+
+  <div class="det-hero">
+    <div class="kicker">Pertemuan 3 · Pengenalan Debugging</div>
+    <h1>🕵️ Detektif Debugging</h1>
+    <p>Kamu bertugas sebagai detektif kode! Setiap kasus berisi program Python yang bermasalah — temukan jenis bug-nya (Syntax, Runtime, atau Logic Error) dan pecahkan kasusnya.</p>
+    <div class="det-stats">
+      <div class="det-chip">🧩 Syntax Error</div>
+      <div class="det-chip">⚠️ Runtime Error</div>
+      <div class="det-chip">🧠 Logic Error</div>
+    </div>
+  </div>
+
+  <div class="det-main">
+    <div id="caseArea"></div>
+
+    <div class="det-nav-row">
+      <button class="det-btn ghost" id="btnPrevCase">← Kasus Sebelumnya</button>
+      <button class="det-btn" id="btnNextCase">Kasus Berikutnya →</button>
+    </div>
+
+    <p style="text-align:center; margin-top:16px; color:#9aa5c9; font-family:'SFMono-Regular', Consolas, monospace; font-size:13px;">
+      Kasus terpecahkan: <span id="caseScore">0</span> / 5
+    </p>
+
+    <div class="det-summary" id="detSummary"></div>
+
+    <div style="text-align:center; margin-top:26px;">
+      <a href="evaluasi.html" class="det-btn ghost">Lihat Progres Belajar →</a>
+    </div>
+  </div>
+</div>
+
+<footer>E-Modul Koding dan Artifisial Intelijen · Bab 2 · SMP Negeri 9 Samarinda</footer>
+<button class="back-top" aria-label="Kembali ke atas">↑</button>
+
+<script src="../js/main.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/detektif.js"></script>
+</body>
+</html>
