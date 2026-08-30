@@ -181,7 +181,31 @@
     <!-- TAB: SISWA -->
     <div class="admin-panel" id="tabSiswa">
       <div class="on-panel-card">
-        <h3>Tambah Akun Siswa</h3>
+        <h3>📥 Import Siswa dari Excel</h3>
+        <p style="color:var(--on-ink-soft); font-size:13.5px; margin-top:-8px;">Cocok untuk daftarkan satu kelas sekaligus. Unduh template dulu, isi di Excel, lalu upload lagi di sini.</p>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;">
+          <button class="on-btn secondary sm" id="btnDownloadTemplateSiswa" style="width:auto;">⬇ Unduh Template Excel</button>
+          <label class="on-btn sm" style="width:auto; cursor:pointer;">
+            📤 Pilih File Excel
+            <input type="file" id="excelSiswaInput" accept=".xlsx,.xls" style="display:none;">
+          </label>
+        </div>
+
+        <div id="importSiswaPreviewWrap" style="display:none;">
+          <p style="font-size:13.5px; font-weight:600; margin-bottom:8px;" id="importSiswaSummaryText"></p>
+          <table class="on-table">
+            <thead><tr><th>Baris</th><th>NISN</th><th>Nama</th><th>Kelas</th><th>Status</th></tr></thead>
+            <tbody id="importSiswaPreviewBody"></tbody>
+          </table>
+          <button class="on-btn accent" id="btnConfirmImportSiswa" style="width:auto; padding:11px 22px; margin-top:14px;">✅ Buat Akun untuk Baris yang Valid</button>
+          <button class="on-btn secondary" id="btnCancelImportSiswa" style="width:auto; padding:11px 22px; margin-top:14px;">Batal</button>
+          <div id="importSiswaProgress" style="margin-top:10px; font-size:13px; color:var(--on-ink-soft);"></div>
+        </div>
+      </div>
+
+      <div class="on-panel-card">
+        <h3>Tambah Akun Siswa (Satu per Satu)</h3>
         <div class="on-field">
           <label>Nomor Absen / NISN</label>
           <input type="text" id="siswaNisn" inputmode="numeric" placeholder="Contoh: 12345678">
@@ -201,7 +225,7 @@
         <div class="on-error" id="siswaError"></div>
         <div class="on-success" id="siswaSuccess">Akun siswa berhasil dibuat ✅</div>
         <button class="on-btn accent" id="btnTambahSiswa" style="width:auto; padding:11px 22px;">➕ Buat Akun Siswa</button>
-        <p style="font-size:12.5px; color:var(--on-ink-soft); margin-top:10px;">💡 Tips: untuk tambah banyak siswa sekaligus, ulangi form ini satu per satu. Siswa login pakai NISN + password ini di halaman <code>login.html</code>.</p>
+        <p style="font-size:12.5px; color:var(--on-ink-soft); margin-top:10px;">💡 Siswa login pakai NISN + password ini di halaman <code>login.html</code>.</p>
       </div>
 
       <div class="on-panel-card">
@@ -530,7 +554,9 @@
       document.getElementById('soalSuccess').classList.add('show');
       setTimeout(() => document.getElementById('soalSuccess').classList.remove('show'), 2000);
 
-      if(document.getElementById('filterSoalPertemuan').value === pertemuan) renderSoalTable();
+      // Pindahkan filter "Daftar Soal" ke pertemuan yang baru saja diisi, supaya langsung terlihat konfirmasinya.
+      document.getElementById('filterSoalPertemuan').value = pertemuan;
+      renderSoalTable();
     }catch(err){
       showToast(friendlyError(err));
     }
@@ -576,7 +602,117 @@
     }
   }
 
-  /* ===== TAB SISWA ===== */
+  /* ===== TAB SISWA: import Excel ===== */
+  document.getElementById('btnDownloadTemplateSiswa').addEventListener('click', () => {
+    const headers = ['NISN', 'Nama', 'Kelas', 'Password Awal'];
+    const contoh1 = ['12345678', 'Andi Saputra', 'IX-A', 'koding123'];
+    const contoh2 = ['12345679', 'Sari Wulandari', 'IX-A', 'koding123'];
+    const ws = XLSX.utils.aoa_to_sheet([headers, contoh1, contoh2]);
+    ws['!cols'] = [{wch:16},{wch:24},{wch:10},{wch:16}];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Siswa');
+    XLSX.writeFile(wb, 'template-siswa-koding-ai.xlsx');
+  });
+
+  let parsedSiswaRows = [];
+
+  document.getElementById('excelSiswaInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const data = new Uint8Array(evt.target.result);
+      const wb = XLSX.read(data, { type: 'array' });
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+
+      parsedSiswaRows = [];
+      for(let i = 1; i < rows.length; i++){
+        const r = rows[i];
+        if(!r || r.every(c => String(c).trim() === '')) continue;
+
+        const nisn = String(r[0] || '').trim();
+        const nama = String(r[1] || '').trim();
+        const kelas = String(r[2] || '').trim();
+        const password = String(r[3] || '').trim();
+
+        let status = 'valid', alasan = '';
+        if(!nisn){ status = 'invalid'; alasan = 'NISN kosong'; }
+        else if(!nama){ status = 'invalid'; alasan = 'Nama kosong'; }
+        else if(!password || password.length < 6){ status = 'invalid'; alasan = 'Password minimal 6 karakter'; }
+
+        parsedSiswaRows.push({ baris: i+1, nisn, nama, kelas, password, status, alasan });
+      }
+      renderImportSiswaPreview();
+    };
+    reader.readAsArrayBuffer(file);
+  });
+
+  function renderImportSiswaPreview(){
+    const wrap = document.getElementById('importSiswaPreviewWrap');
+    const tbody = document.getElementById('importSiswaPreviewBody');
+    const validCount = parsedSiswaRows.filter(r => r.status === 'valid').length;
+    document.getElementById('importSiswaSummaryText').textContent =
+      `Ditemukan ${parsedSiswaRows.length} baris — ${validCount} valid, ${parsedSiswaRows.length - validCount} bermasalah (tidak akan dibuatkan akun).`;
+
+    tbody.innerHTML = parsedSiswaRows.map(r => `
+      <tr>
+        <td>${r.baris}</td>
+        <td>${escapeHtml(r.nisn || '(kosong)')}</td>
+        <td>${escapeHtml(r.nama || '(kosong)')}</td>
+        <td>${escapeHtml(r.kelas || '-')}</td>
+        <td>${r.status === 'valid' ? '✅ Valid' : '⚠️ ' + r.alasan}</td>
+      </tr>
+    `).join('');
+    wrap.style.display = 'block';
+    document.getElementById('btnConfirmImportSiswa').disabled = validCount === 0;
+    document.getElementById('importSiswaProgress').textContent = '';
+  }
+
+  document.getElementById('btnCancelImportSiswa').addEventListener('click', () => {
+    parsedSiswaRows = [];
+    document.getElementById('importSiswaPreviewWrap').style.display = 'none';
+    document.getElementById('excelSiswaInput').value = '';
+  });
+
+  document.getElementById('btnConfirmImportSiswa').addEventListener('click', async () => {
+    const validRows = parsedSiswaRows.filter(r => r.status === 'valid');
+    if(validRows.length === 0) return;
+
+    const btn = document.getElementById('btnConfirmImportSiswa');
+    btn.disabled = true; btn.textContent = 'Membuat akun...';
+    const progressEl = document.getElementById('importSiswaProgress');
+
+    let sukses = 0, gagal = 0;
+    const hasilGagal = [];
+
+    // Dibuat SATU PER SATU (bukan sekaligus) supaya sesi secondaryAuth tidak tabrakan.
+    for(let i = 0; i < validRows.length; i++){
+      const r = validRows[i];
+      progressEl.textContent = `Memproses ${i+1} dari ${validRows.length}: ${r.nama}...`;
+      try{
+        const email = r.nisn + '@' + STUDENT_EMAIL_DOMAIN;
+        await createUserWithEmailAndPassword(secondaryAuth, email, r.password);
+        await setDoc(doc(db, 'students', r.nisn), { nama: r.nama, kelas: r.kelas });
+        await signOut(secondaryAuth);
+        sukses++;
+      }catch(err){
+        gagal++;
+        let pesan = err.code === 'auth/email-already-in-use' ? 'NISN sudah terdaftar' : (err.message || 'gagal');
+        hasilGagal.push(`${r.nisn} (${r.nama}): ${pesan}`);
+      }
+    }
+
+    progressEl.innerHTML = `✅ Selesai: ${sukses} akun berhasil dibuat${gagal > 0 ? `, ${gagal} gagal` : ''}.` +
+      (hasilGagal.length ? '<br>Gagal: ' + hasilGagal.map(escapeHtml).join('; ') : '');
+    showToast(`Import selesai: ${sukses} berhasil, ${gagal} gagal.`);
+    parsedSiswaRows = [];
+    document.getElementById('excelSiswaInput').value = '';
+    btn.disabled = false; btn.textContent = '✅ Buat Akun untuk Baris yang Valid';
+    renderSiswaTable();
+  });
+
+  /* ===== TAB SISWA: tambah satu per satu ===== */
   document.getElementById('btnTambahSiswa').addEventListener('click', async () => {
     const errBox = document.getElementById('siswaError');
     errBox.classList.remove('show');

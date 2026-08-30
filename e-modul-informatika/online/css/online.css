@@ -139,4 +139,21 @@ input:checked + .slider::before{transform:translateX(20px);}
 
 @media (max-width:720px){
   .pert-grid{grid-template-columns:1fr;}
+
+  /* Tabel jadi bisa digeser ke samping, kolomnya gak kepenyet */
+  .on-table{display:block; overflow-x:auto; white-space:nowrap; -webkit-overflow-scrolling:touch;}
+
+  /* Topbar & tombol jangan sampai tabrakan di layar sempit */
+  .on-topbar{flex-wrap:wrap; row-gap:6px;}
+  .who{flex-wrap:wrap; justify-content:flex-end; gap:8px !important;}
+
+  .admin-tabs{overflow-x:auto; flex-wrap:nowrap; -webkit-overflow-scrolling:touch;}
+  .admin-tabs button{flex-shrink:0;}
+
+  .on-card{padding:26px 20px;}
+}
+
+@media (max-width:420px){
+  .pert-card .score{font-size:22px;}
+  .on-btn{font-size:14px;}
 }

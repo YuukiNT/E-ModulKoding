@@ -16,8 +16,11 @@
       <li><a href="../index.html">Beranda</a></li>
       <li><a href="ice-breaking.html">Ice Breaking</a></li>
       <li><a href="materi.html" class="active">Materi</a></li>
+      <li><a href="mode-sederhana.html">Mode ABK</a></li>
       <li><a href="coding-lab.html">Coding Lab</a></li>
       <li><a href="latihan.html">Latihan</a></li>
+      <li><a href="flashcard.html">Flashcard</a></li>
+      <li><a href="cheat-sheet.html">Cheat Sheet</a></li>
       <li><a href="detektif-bug.html">Detektif Bug</a></li>
       <li><a href="kuis.html">Kuis</a></li>
       <li><a href="evaluasi.html">Progres</a></li>
@@ -33,34 +36,78 @@
   <div class="container" style="max-width:760px;">
     <div class="eyebrow">Bab 2 · Koding dan Artifisial Intelijen</div>
     <h2 style="font-size:26px;">Membuat Program yang Lebih Canggih</h2>
-    <p style="color:var(--ink-soft);">Materi ditulis dalam bahasa Python — sama seperti yang kamu praktikkan di Thonny/VS Code di lab komputer. Klik tiap pertemuan untuk membuka.</p>
+    <p style="color:var(--ink-soft);">Materi ditulis dalam bahasa Python — sama seperti yang kamu praktikkan di Thonny/VS Code di lab komputer. Klik tiap pertemuan untuk membuka. Ada tombol 🔊 kalau kamu lebih suka didengarkan daripada dibaca.</p>
+
+    <div class="card" style="display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin:18px 0 28px 0;">
+      <div>
+        <h3 style="margin-bottom:4px;">🧩 Butuh versi yang lebih sederhana?</h3>
+        <p style="margin:0;">Ada versi materi dengan bahasa lebih ringkas, tugas kode isian rumpang, dan langkah lebih kecil.</p>
+      </div>
+      <a href="mode-sederhana.html" class="btn accent" style="flex-shrink:0;">Buka Mode ABK →</a>
+    </div>
 
     <!-- PERTEMUAN 1 -->
     <div class="accordion-item">
       <div class="accordion-head"><span><span class="badge">PERTEMUAN 1</span>Struktur Logika Kompleks</span><span class="chevron">▾</span></div>
-      <div class="accordion-body">
+      <div class="accordion-body" id="materi-p1">
+        <button class="tts-btn" data-tts-target="#materi-p1">🔊 Dengarkan Penjelasan Pertemuan Ini</button>
+
         <h4>A. Tujuan Pembelajaran</h4>
-        <p>Menganalisis dan menerapkan struktur logika kompleks (nested if, nested loop, list methods, comparison chaining, fungsi modular) untuk merancang algoritma program secara sistematis.</p>
+        <p class="tts-para">Menganalisis dan menerapkan struktur logika kompleks (nested if, nested loop, list methods, comparison chaining, fungsi modular) untuk merancang algoritma program secara sistematis.</p>
 
         <h4>B. Apersepsi</h4>
-        <p>Bayangkan fungsi seperti "mesin pemroses": ada <em>input</em> yang masuk, ada <em>proses</em> di dalam mesin, lalu keluar <em>output</em>-nya. Fungsi dalam Python bekerja persis seperti itu.</p>
+        <p class="tts-para">Pernah pakai blender buat bikin jus? Kamu masukkan buah (itu <strong>input</strong>), blender kerja menghaluskan (itu <strong>proses</strong>), dan keluar jus (itu <strong>output</strong>). Fungsi dalam Python bekerja persis seperti blender itu — dan sepanjang pertemuan ini, kamu akan belajar bikin "mesin-mesin" logika yang lebih canggih dari sekadar satu blender: ada yang punya banyak saklar pilihan (percabangan bertingkat), ada yang mengulang proses berkali-kali dengan pola berlapis (perulangan bertingkat).</p>
 
-        <h4>C. Materi — Nested If &amp; Comparison Chaining</h4>
-        <p><strong>Nested if</strong> adalah percabangan di dalam percabangan lain — dipakai saat ada lebih dari satu syarat yang harus dicek berurutan. Python juga punya jalan pintas <strong>comparison chaining</strong> untuk mengecek rentang nilai sekaligus.</p>
-        <pre class="code">nilai = 85
+        <h4>C. Materi — Nested If (Percabangan Bersarang)</h4>
+        <p class="tts-para">Sejauh ini kamu sudah kenal <code>if</code> biasa: satu syarat, satu keputusan. Tapi di dunia nyata, keputusan sering butuh lebih dari satu syarat. Contoh: sebuah wahana di taman bermain hanya boleh dinaiki kalau <em>tinggi badan di atas 120 cm</em> DAN <em>punya tiket</em>. Ada dua syarat yang harus dicek, dan syarat kedua baru dicek kalau syarat pertama sudah terpenuhi. Inilah yang disebut <strong>nested if</strong> — percabangan <code>if</code> yang diletakkan di dalam percabangan <code>if</code> lain.</p>
+        <pre class="code">tinggi = 130
+punya_tiket = True
+
+<span style="color:#e07b39;">if</span> tinggi &gt;= 120:
+    <span style="color:#e07b39;">if</span> punya_tiket:
+        print(<span style="color:#2f9e5b;">"Boleh naik wahana!"</span>)
+    <span style="color:#e07b39;">else</span>:
+        print(<span style="color:#2f9e5b;">"Beli tiket dulu ya."</span>)
+<span style="color:#e07b39;">else</span>:
+    print(<span style="color:#2f9e5b;">"Tinggi badan belum cukup."</span>)</pre>
+        <p class="tts-para">Perhatikan baik-baik: <code>if punya_tiket</code> ditulis lebih menjorok ke dalam (ada indentasi tambahan) dibanding <code>if tinggi &gt;= 120</code>. Indentasi inilah yang memberi tahu Python bahwa syarat kedua itu "bersarang" di dalam syarat pertama — kalau syarat pertama salah, Python bahkan tidak akan pernah mengecek syarat kedua sama sekali.</p>
+
+        <h4>D. Materi — Comparison Chaining (Jalan Pintas Mengecek Rentang)</h4>
+        <p class="tts-para">Kadang kita perlu mengecek apakah sebuah nilai berada di antara dua batas, misalnya nilai ujian 80 sampai 90. Cara panjangnya memakai <code>and</code>, tapi Python punya jalan pintas yang lebih rapi bernama <strong>comparison chaining</strong>.</p>
+        <pre class="code"><span style="color:#8a95ad;"># Cara panjang</span>
+nilai = 85
+<span style="color:#e07b39;">if</span> nilai &gt;= 80 <span style="color:#e07b39;">and</span> nilai &lt;= 90:
+    print(<span style="color:#2f9e5b;">"Nilai kamu di rentang 80-90!"</span>)
+
+<span style="color:#8a95ad;"># Jalan pintas comparison chaining -- hasilnya sama persis</span>
 <span style="color:#e07b39;">if</span> 80 &lt;= nilai &lt;= 90:
     print(<span style="color:#2f9e5b;">"Nilai kamu di rentang 80-90!"</span>)</pre>
+        <p class="tts-para">Dua kode di atas melakukan hal yang persis sama — comparison chaining cuma bikin tulisannya lebih pendek dan lebih gampang dibaca, seperti membaca kalimat matematika biasa: "80 lebih-kecil-sama-dengan nilai lebih-kecil-sama-dengan 90".</p>
 
-        <h4>D. Materi — Nested Loop &amp; Metode List</h4>
-        <p><strong>Nested loop</strong> adalah perulangan di dalam perulangan lain. Tipe data list punya metode bawaan yang sering dipakai: <code>.append()</code> (menambah data), <code>.sort()</code> (mengurutkan), <code>.remove()</code> dan <code>.pop()</code> (menghapus data).</p>
+        <h4>E. Materi — Nested Loop (Perulangan Bersarang)</h4>
+        <p class="tts-para">Bayangkan kalender satu bulan: ada beberapa minggu, dan setiap minggu punya 7 hari. Untuk "mengunjungi" setiap hari dalam sebulan, kamu sebenarnya melakukan dua perulangan sekaligus — luar (minggu) dan dalam (hari). Itulah <strong>nested loop</strong>: perulangan <code>for</code> yang diletakkan di dalam perulangan <code>for</code> lain.</p>
+        <pre class="code"><span style="color:#e07b39;">for</span> minggu <span style="color:#e07b39;">in</span> range(1, 3):
+    <span style="color:#e07b39;">for</span> hari <span style="color:#e07b39;">in</span> range(1, 8):
+        print(<span style="color:#2f9e5b;">"Minggu"</span>, minggu, <span style="color:#2f9e5b;">"Hari ke-"</span>, hari)</pre>
+        <p class="tts-para">Setiap kali perulangan luar (<code>minggu</code>) berjalan satu langkah, perulangan dalam (<code>hari</code>) akan berjalan penuh dari awal sampai akhir dulu. Jadi urutan cetaknya: Minggu 1 Hari 1, Minggu 1 Hari 2, ... sampai Minggu 1 Hari 7, baru lanjut ke Minggu 2 Hari 1, dan seterusnya.</p>
+
+        <h4>F. Materi — Metode List (append, sort, remove, pop)</h4>
+        <p class="tts-para">List di Python itu seperti rak buku yang isinya bisa kamu ubah kapan saja — tambah buku baru, urutkan berdasarkan judul, atau ambil satu buku dari rak. Ada empat "perintah rak buku" yang paling sering dipakai:</p>
         <pre class="code">antrean = []
-antrean.append(<span style="color:#2f9e5b;">"Andi"</span>)
+antrean.append(<span style="color:#2f9e5b;">"Andi"</span>)   <span style="color:#8a95ad;"># tambah data baru di paling belakang</span>
 antrean.append(<span style="color:#2f9e5b;">"Sari"</span>)
-pelanggan_pertama = antrean.pop(0)  <span style="color:#8a95ad;"># FIFO: yang pertama masuk, pertama dilayani</span>
-print(pelanggan_pertama)</pre>
+print(antrean)              <span style="color:#8a95ad;"># ['Andi', 'Sari']</span>
 
-        <h4>E. Contoh Kode — Fungsi Konversi Suhu</h4>
-        <p>Fungsi (<code>def</code>) membungkus kode agar bisa dipanggil ulang tanpa menulis ulang. <code>return</code> mengirim balik hasilnya.</p>
+antrean.sort()               <span style="color:#8a95ad;"># urutkan (alfabet untuk teks)</span>
+print(antrean)              <span style="color:#8a95ad;"># ['Andi', 'Sari'] -- sudah urut A dulu</span>
+
+pelanggan_pertama = antrean.pop(0)   <span style="color:#8a95ad;"># ambil & hapus data di posisi 0 (paling depan)</span>
+print(pelanggan_pertama)    <span style="color:#8a95ad;"># Andi</span>
+print(antrean)              <span style="color:#8a95ad;"># ['Sari'] -- Andi sudah keluar dari list</span></pre>
+        <p class="tts-para">Metode <code>.pop(0)</code> di atas persis menggambarkan prinsip <strong>FIFO (First In First Out)</strong> — orang yang pertama masuk antrean adalah yang pertama dilayani (dan pertama keluar dari list). Ini akan kamu pakai lagi di Pertemuan 2 untuk simulasi antrean pelanggan.</p>
+
+        <h4>G. Materi — Fungsi Modular (def &amp; return)</h4>
+        <p class="tts-para">Ingat analogi blender tadi? Fungsi adalah cara kita "membungkus" sekumpulan perintah jadi satu mesin yang bisa dipakai berkali-kali tanpa perlu menulis ulang kodenya. Kata kunci <code>def</code> dipakai untuk membuat fungsi baru, dan <code>return</code> dipakai untuk mengirim balik hasilnya keluar dari fungsi.</p>
         <div class="code-wrap">
           <pre class="code" id="code-p1">def celsius_ke_fahrenheit(c):
     f = (c * 9/5) + 32
@@ -70,20 +117,21 @@ hasil = celsius_ke_fahrenheit(30)
 print("Hasil dalam Fahrenheit:", hasil)</pre>
         </div>
         <button class="btn sm accent" data-tryit="code-p1" data-tugas="">▶ Coba Logikanya di Coding Lab</button>
+        <p class="tts-para">Bagian <code>(c)</code> di dalam kurung disebut <strong>parameter</strong> — semacam "lubang input" pada mesin. Saat kita memanggil <code>celsius_ke_fahrenheit(30)</code>, angka 30 itu disebut <strong>argumen</strong> yang dimasukkan ke lubang input <code>c</code>. Keuntungan besar memakai fungsi: kalau besok kamu butuh konversi suhu lagi di bagian lain program, kamu tinggal panggil <code>celsius_ke_fahrenheit(...)</code> lagi, tanpa perlu menulis ulang tiga baris rumusnya.</p>
 
-        <h4>F. Coba Sendiri</h4>
-        <p>Di Thonny/VS Code, ubah nilai <code>c</code> pada pemanggilan fungsi, lalu jalankan lagi programnya.</p>
+        <h4>H. Coba Sendiri</h4>
+        <p class="tts-para">Di Thonny/VS Code, ubah nilai <code>c</code> pada pemanggilan fungsi, lalu jalankan lagi programnya. Coba juga tebak dulu hasilnya sebelum program dijalankan — ini melatih kemampuan berpikir komputasionalmu.</p>
 
-        <h4>G. Tantangan 1</h4>
-        <p>Buat fungsi <code>fahrenheit_ke_kelvin(f)</code> yang mengonversi Fahrenheit ke Kelvin, lalu uji dengan beberapa nilai berbeda.</p>
+        <h4>I. Tantangan 1</h4>
+        <p class="tts-para">Buat fungsi <code>fahrenheit_ke_kelvin(f)</code> yang mengonversi Fahrenheit ke Kelvin, lalu uji dengan beberapa nilai berbeda. Petunjuk rumus: Kelvin = (Fahrenheit − 32) × 5/9 + 273.15.</p>
 
-        <h4>H. Ringkasan</h4>
-        <p>Struktur logika kompleks (nested if, nested loop, fungsi, metode list) memungkinkan program menyelesaikan masalah yang lebih dari satu langkah keputusan.</p>
+        <h4>J. Ringkasan</h4>
+        <p class="tts-para">Struktur logika kompleks (nested if, comparison chaining, nested loop, metode list, dan fungsi) memungkinkan program menyelesaikan masalah yang butuh lebih dari satu langkah keputusan — dan membuat kodemu lebih rapi karena tidak perlu ditulis berulang-ulang.</p>
 
-        <h4>I. Latihan</h4>
+        <h4>K. Latihan</h4>
         <p><a href="latihan.html">Kerjakan latihan Pertemuan 1 →</a></p>
 
-        <h4>J. Refleksi</h4>
+        <h4>L. Refleksi</h4>
         <textarea class="reflect" data-refleksi="p1" placeholder="Setelah mempelajari materi ini, apa hal baru yang kamu pahami?"></textarea>
         <div style="margin-top:10px; display:flex; gap:8px;">
           <button class="btn sm" data-simpan-refleksi="p1">Simpan Refleksi</button>
@@ -95,15 +143,17 @@ print("Hasil dalam Fahrenheit:", hasil)</pre>
     <!-- PERTEMUAN 2 -->
     <div class="accordion-item">
       <div class="accordion-head"><span><span class="badge">PERTEMUAN 2</span>Kasir Cerdas &amp; Strategi Algoritma</span><span class="chevron">▾</span></div>
-      <div class="accordion-body">
+      <div class="accordion-body" id="materi-p2">
+        <button class="tts-btn" data-tts-target="#materi-p2">🔊 Dengarkan Penjelasan Pertemuan Ini</button>
+
         <h4>A. Tujuan Pembelajaran</h4>
-        <p>Merancang dan memproduksi kode program terstruktur menggunakan variabel, kondisi bersarang, perulangan, serta strategi algoritma pada program Python (Kasir Cerdas).</p>
+        <p class="tts-para">Merancang dan memproduksi kode program terstruktur menggunakan variabel, kondisi bersarang, perulangan, serta strategi algoritma pada program Python (Kasir Cerdas).</p>
 
         <h4>B. Apersepsi</h4>
-        <p>Pernah lihat kasir toko memberi poin belanja atau diskon otomatis? Di balik layar, itu program dengan percabangan bertingkat yang mengecek total belanjamu.</p>
+        <p class="tts-para">Pernah belanja di minimarket dan dapat poin otomatis, atau diskon makin besar kalau belanja makin banyak? Di balik layar kasir itu, ada program sederhana yang mengecek total belanjamu lewat serangkaian <code>if</code> dan <code>elif</code> bertingkat — persis seperti yang akan kamu bangun hari ini.</p>
 
         <h4>C. Materi — Program Kasir Cerdas (Diskon &amp; Poin Berjenjang)</h4>
-        <p>Ini kode asli yang kamu kembangkan bersama kelompok saat proyek Kasir Cerdas — menghitung poin belanja berdasarkan total transaksi:</p>
+        <p class="tts-para">Ini kode asli yang kamu kembangkan bersama kelompok saat proyek Kasir Cerdas — menghitung poin belanja berdasarkan total transaksi. Perhatikan bagaimana <code>elif</code> dipakai berurutan dari syarat terbesar ke terkecil:</p>
         <pre class="code" id="code-p2">total = int(input("Total belanja: "))
 poin = 0
 
@@ -116,12 +166,21 @@ elif total > 100000:
 
 print("Poin didapat:", poin)</pre>
         <button class="btn sm accent" data-tryit="code-p2" data-tugas="">▶ Coba Logikanya di Coding Lab</button>
+        <p class="tts-para">Kenapa urutannya harus dari syarat terbesar dulu? Karena Python mengecek <code>elif</code> dari atas ke bawah dan langsung berhenti begitu satu syarat terpenuhi. Kalau belanja 600.000, syarat pertama (&gt;500.000) langsung benar dan Python berhenti di situ — tidak sempat mengecek syarat-syarat di bawahnya lagi. Coba bayangkan kalau urutannya dibalik (terkecil dulu) — poin 600.000 akan salah dihitung sebagai poin 2, bukan 5!</p>
 
         <h4>D. Materi — Simulasi Antrean FIFO</h4>
-        <p>Prinsip <strong>FIFO (First In First Out)</strong> — pelanggan yang datang duluan, dilayani duluan — dipakai untuk simulasi antrean, memakai <code>.append()</code> untuk menambah dan <code>.pop(0)</code> untuk melayani dari depan.</p>
+        <p class="tts-para">Ingat prinsip <strong>FIFO (First In First Out)</strong> dari Pertemuan 1? Pelanggan yang datang duluan, dilayani duluan — sama seperti antrean di kasir sungguhan. Kita bisa menggabungkan <code>.append()</code> untuk menambah pelanggan baru ke antrean, dan <code>.pop(0)</code> untuk melayani pelanggan paling depan.</p>
+        <pre class="code">antrean_kasir = []
+antrean_kasir.append(<span style="color:#2f9e5b;">"Budi"</span>)
+antrean_kasir.append(<span style="color:#2f9e5b;">"Citra"</span>)
+antrean_kasir.append(<span style="color:#2f9e5b;">"Dedi"</span>)
+
+<span style="color:#e07b39;">while</span> len(antrean_kasir) &gt; 0:
+    dilayani = antrean_kasir.pop(0)
+    print(<span style="color:#2f9e5b;">"Melayani:"</span>, dilayani)</pre>
 
         <h4>E. Materi — Strategi Algoritma Greedy</h4>
-        <p>Algoritma <strong>Greedy</strong> selalu memilih langkah terbaik/terbesar di setiap tahap tanpa melihat keseluruhan hasil akhir — contohnya menentukan pecahan kembalian uang dengan jumlah lembar paling sedikit.</p>
+        <p class="tts-para">Bayangkan kamu jadi kasir yang harus memberi kembalian dengan lembar uang sesedikit mungkin. Cara paling logis: ambil dulu lembar bernilai paling besar yang masih muat, baru sisanya diselesaikan dengan lembar yang lebih kecil, diulang terus sampai kembaliannya pas. Cara berpikir "selalu ambil pilihan terbaik yang tersedia saat itu juga" inilah yang disebut <strong>algoritma Greedy</strong> (rakus) — greedy tidak memikirkan jauh ke depan, cuma fokus pada langkah terbaik di depan mata.</p>
         <pre class="code">kembalian = 37000
 pecahan = [20000, 10000, 5000, 2000, 1000]
 hasil = []
@@ -129,16 +188,17 @@ for p in pecahan:
     while kembalian >= p:
         hasil.append(p)
         kembalian -= p
-print(hasil)</pre>
+print(hasil)   <span style="color:#8a95ad;"># [20000, 10000, 5000, 2000]</span></pre>
+        <p class="tts-para">Perhatikan: perulangan luar (<code>for p in pecahan</code>) berjalan dari pecahan terbesar ke terkecil, dan perulangan dalam (<code>while</code>) mengambil pecahan yang sama berkali-kali selama kembalian masih cukup besar. Ini contoh nested loop juga, sekaligus contoh strategi Greedy dipakai nyata.</p>
 
         <h4>F. Coba Sendiri</h4>
-        <p>Ubah nilai <code>total</code> pada kode Kasir Cerdas dan cek apakah poin yang keluar sudah sesuai aturan diskon berjenjang.</p>
+        <p class="tts-para">Ubah nilai <code>total</code> pada kode Kasir Cerdas dan cek apakah poin yang keluar sudah sesuai aturan diskon berjenjang. Coba juga angka pas di batas (misalnya persis 500000) — apakah dapat poin 5 atau poin 3? Ini melatih ketelitianmu membaca operator perbandingan.</p>
 
         <h4>G. Tantangan 2 (Proyek Kelompok)</h4>
-        <p>Gabungkan program Kasir Cerdas dengan simulasi Antrean FIFO: setiap pelanggan dalam antrean dihitung poinnya berdasarkan total belanja masing-masing.</p>
+        <p class="tts-para">Gabungkan program Kasir Cerdas dengan simulasi Antrean FIFO: setiap pelanggan dalam antrean dihitung poinnya berdasarkan total belanja masing-masing.</p>
 
         <h4>H. Ringkasan</h4>
-        <p>Program yang canggih menggabungkan variabel, kondisi bersarang, dan strategi algoritma (seperti Greedy) untuk menyelesaikan masalah nyata secara efisien.</p>
+        <p class="tts-para">Program yang canggih menggabungkan variabel, kondisi bersarang, dan strategi algoritma (seperti Greedy) untuk menyelesaikan masalah nyata secara efisien — dan urutan pengecekan syarat (dari besar ke kecil) ternyata sangat menentukan hasil akhirnya.</p>
 
         <h4>I. Latihan</h4>
         <p><a href="latihan.html">Kerjakan latihan Pertemuan 2 →</a></p>
@@ -155,50 +215,57 @@ print(hasil)</pre>
     <!-- PERTEMUAN 3 -->
     <div class="accordion-item">
       <div class="accordion-head"><span><span class="badge">PERTEMUAN 3</span>Pengenalan Debugging</span><span class="chevron">▾</span></div>
-      <div class="accordion-body">
+      <div class="accordion-body" id="materi-p3">
+        <button class="tts-btn" data-tts-target="#materi-p3">🔊 Dengarkan Penjelasan Pertemuan Ini</button>
+
         <h4>A. Tujuan Pembelajaran</h4>
-        <p>Mengidentifikasi 3 jenis bug (Syntax Error, Runtime Error, Logic Error) serta menerapkan teknik debugging untuk melacak dan memperbaiki kesalahan kode program Python.</p>
+        <p class="tts-para">Mengidentifikasi 3 jenis bug (Syntax Error, Runtime Error, Logic Error) serta menerapkan teknik debugging untuk melacak dan memperbaiki kesalahan kode program Python.</p>
 
         <h4>B. Apersepsi</h4>
-        <p>Program yang lebih canggih juga berarti lebih banyak kemungkinan bug. Seorang programmer yang baik bukan yang tidak pernah membuat bug, tapi yang cepat menemukan dan memperbaikinya.</p>
+        <p class="tts-para">Program yang lebih canggih juga berarti lebih banyak kemungkinan bug (kesalahan). Kabar baiknya: semua programmer, sepintar apapun mereka, pasti pernah bikin bug — bahkan setiap hari. Bedanya, programmer yang baik bukan yang tidak pernah salah, tapi yang cepat dan sistematis dalam menemukan serta memperbaiki kesalahannya.</p>
 
         <h4>C. Materi — 3 Jenis Bug</h4>
+        <p class="tts-para">Ada tiga jenis kesalahan program yang perlu kamu kenali, karena cara mendeteksinya berbeda-beda:</p>
         <ul>
-          <li><strong>Syntax Error</strong> — kesalahan penulisan aturan bahasa (misal lupa tanda titik dua <code>:</code>).</li>
-          <li><strong>Runtime Error</strong> — program berhenti saat dijalankan karena hal tak terduga (misal membagi dengan nol).</li>
-          <li><strong>Logic Error</strong> — program berjalan lancar tanpa pesan error, tapi hasilnya salah.</li>
+          <li class="tts-para"><strong>Syntax Error</strong> — kesalahan penulisan aturan bahasa, seperti typo dalam Bahasa Indonesia. Contoh: lupa tanda titik dua <code>:</code> setelah <code>if</code>, atau lupa tutup tanda kurung. Python langsung menolak menjalankan program sama sekali kalau ada Syntax Error, jadi ini yang paling mudah disadari.</li>
+          <li class="tts-para"><strong>Runtime Error</strong> — program sempat berjalan, tapi tiba-tiba berhenti di tengah jalan karena hal tak terduga, misalnya membagi dengan angka nol, atau mencoba mengambil data list di posisi yang tidak ada.</li>
+          <li class="tts-para"><strong>Logic Error</strong> — ini yang paling licik: program berjalan lancar dari awal sampai akhir, tidak ada pesan error sama sekali, tapi hasilnya salah. Contohnya rumus yang salah ditulis, atau syarat percabangan yang terbalik.</li>
         </ul>
 
-        <h4>D. Materi — Membaca Traceback &amp; try-except</h4>
-        <p>Pesan error di Python disebut <strong>Traceback</strong> — berisi petunjuk baris mana yang bermasalah. Blok <code>try-except</code> dipakai untuk menangani error agar program tidak langsung berhenti.</p>
+        <h4>D. Materi — Membaca Traceback</h4>
+        <p class="tts-para">Ketika Python menemukan Syntax Error atau Runtime Error, dia akan menampilkan pesan yang disebut <strong>Traceback</strong>. Jangan takut kalau pesannya panjang dan berwarna merah — di baris paling bawah biasanya ada info paling penting: nomor baris yang bermasalah dan jenis errornya. Kebiasaan baik: selalu baca dari baris paling bawah dulu.</p>
+
+        <h4>E. Materi — Menangani Error dengan try-except</h4>
+        <p class="tts-para">Kadang kita tidak bisa mencegah error sepenuhnya — misalnya kalau pengguna program salah memasukkan data. Blok <code>try-except</code> dipakai supaya program tidak langsung berhenti total, tapi memberi pesan yang ramah dan tetap lanjut berjalan.</p>
         <pre class="code">try:
     angka = int(input("Masukkan angka: "))
     print(100 / angka)
 except:
     print("⚠️ Terjadi kesalahan, pastikan input berupa angka bukan 0.")</pre>
+        <p class="tts-para">Cara bacanya: Python akan "mencoba" (<code>try</code>) menjalankan kode di dalamnya. Kalau berhasil, blok <code>except</code> dilewati begitu saja. Tapi kalau di tengah jalan terjadi error apapun, Python langsung lompat ke blok <code>except</code> dan menjalankan kode di situ, alih-alih menghentikan seluruh program.</p>
 
-        <h4>E. Aktivitas — Detektif Debugging</h4>
-        <p>Sekarang saatnya praktik langsung! Buka halaman khusus <strong>Detektif Debugging</strong> untuk memecahkan 5 kasus kode bermasalah dari materi Bab 2.</p>
+        <h4>F. Aktivitas — Detektif Debugging</h4>
+        <p class="tts-para">Sekarang saatnya praktik langsung! Buka halaman khusus Detektif Debugging untuk memecahkan 5 kasus kode bermasalah dari materi Bab 2 — kamu akan berperan sebagai detektif yang harus menentukan jenis bug-nya dan cara memperbaikinya.</p>
         <a href="detektif-bug.html" class="btn sm accent">🕵️ Buka Detektif Debugging</a>
 
-        <h4>F. Langkah Debugging</h4>
+        <h4>G. Langkah Debugging yang Sistematis</h4>
         <ol>
-          <li>Baca pesan Traceback untuk tahu baris mana yang bermasalah.</li>
-          <li>Tambahkan <code>print()</code> di beberapa titik untuk melacak nilai variabel.</li>
-          <li>Telusuri logika program baris demi baris.</li>
-          <li>Perbaiki satu bug dalam satu waktu, lalu uji ulang.</li>
+          <li class="tts-para">Baca pesan Traceback untuk tahu baris mana yang bermasalah (kalau ada pesan errornya).</li>
+          <li class="tts-para">Tambahkan <code>print()</code> di beberapa titik untuk melacak nilai variabel — ini seperti memasang "kamera CCTV" di beberapa titik program untuk melihat apa yang sebenarnya terjadi.</li>
+          <li class="tts-para">Telusuri logika program baris demi baris, seolah-olah kamu adalah komputer yang menjalankannya satu per satu.</li>
+          <li class="tts-para">Perbaiki satu bug dalam satu waktu, lalu jalankan ulang untuk memastikan perbaikanmu benar-benar berhasil sebelum lanjut mencari bug lain.</li>
         </ol>
 
-        <h4>G. Tantangan 3</h4>
-        <p>Ambil program Kasir Cerdas dari Pertemuan 2, lalu tambahkan blok <code>try-except</code> agar program tidak error jika pengguna memasukkan huruf, bukan angka.</p>
+        <h4>H. Tantangan 3</h4>
+        <p class="tts-para">Ambil program Kasir Cerdas dari Pertemuan 2, lalu tambahkan blok <code>try-except</code> agar program tidak error jika pengguna memasukkan huruf, bukan angka.</p>
 
-        <h4>H. Ringkasan</h4>
-        <p>Debugging adalah keterampilan penting: mengenali jenis bug, menelusuri Traceback, dan memperbaiki kesalahan secara sistematis.</p>
+        <h4>I. Ringkasan</h4>
+        <p class="tts-para">Debugging adalah keterampilan penting bagi setiap programmer: mengenali jenis bug (Syntax, Runtime, atau Logic Error), menelusuri Traceback, dan memperbaiki kesalahan secara sistematis satu per satu — bukan asal coba-coba.</p>
 
-        <h4>I. Latihan</h4>
+        <h4>J. Latihan</h4>
         <p><a href="latihan.html">Kerjakan latihan Pertemuan 3 →</a></p>
 
-        <h4>J. Refleksi</h4>
+        <h4>K. Refleksi</h4>
         <textarea class="reflect" data-refleksi="p3" placeholder="Setelah mempelajari seluruh Bab 2, apa yang paling kamu pahami dan apa yang masih perlu dipelajari lagi?"></textarea>
         <div style="margin-top:10px; display:flex; gap:8px;">
           <button class="btn sm" data-simpan-refleksi="p3">Simpan Refleksi</button>
@@ -208,6 +275,8 @@ except:
     </div>
 
     <div style="margin-top:26px; display:flex; gap:10px; flex-wrap:wrap;">
+      <a href="flashcard.html" class="btn ghost">🗂️ Flashcard Istilah</a>
+      <a href="cheat-sheet.html" class="btn ghost">📋 Cheat Sheet Python</a>
       <a href="detektif-bug.html" class="btn">🕵️ Main Detektif Debugging</a>
       <a href="kuis.html" class="btn ghost">Lanjut ke Kuis →</a>
     </div>
@@ -220,6 +289,7 @@ except:
 <script src="../js/main.js"></script>
 <script src="../js/progress.js"></script>
 <script src="../js/compiler.js"></script>
+<script src="../js/tts.js"></script>
 <script>
   initAccordion();
 

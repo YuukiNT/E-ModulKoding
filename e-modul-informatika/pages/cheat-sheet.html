@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet Python · E-Modul Koding &amp; AI</title>
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/responsive.css">
+<link rel="stylesheet" href="../css/cheatsheet.css">
+</head>
+<body>
+
+<nav class="navbar no-print">
+  <div class="navbar-inner">
+    <div class="logo"><span class="emoji">💻</span> E-Modul Koding &amp; AI</div>
+    <ul class="nav-links">
+      <li><a href="../index.html">Beranda</a></li>
+      <li><a href="ice-breaking.html">Ice Breaking</a></li>
+      <li><a href="materi.html">Materi</a></li>
+      <li><a href="mode-sederhana.html">Mode ABK</a></li>
+      <li><a href="coding-lab.html">Coding Lab</a></li>
+      <li><a href="latihan.html">Latihan</a></li>
+      <li><a href="flashcard.html">Flashcard</a></li>
+      <li><a href="cheat-sheet.html" class="active">Cheat Sheet</a></li>
+      <li><a href="detektif-bug.html">Detektif Bug</a></li>
+      <li><a href="kuis.html">Kuis</a></li>
+      <li><a href="evaluasi.html">Progres</a></li>
+    </ul>
+    <div class="nav-tools">
+      <button class="icon-btn" data-theme-toggle aria-label="Ganti tema">🌙</button>
+      <button class="hamburger" aria-label="Buka menu">☰</button>
+    </div>
+  </div>
+</nav>
+
+<section class="section">
+  <div class="container cs-container">
+    <div class="cs-header no-print">
+      <div>
+        <div class="eyebrow">Referensi Cepat</div>
+        <h2 style="font-size:26px; margin-bottom:4px;">📋 Cheat Sheet Python — Bab 2</h2>
+        <p style="color:var(--ink-soft); margin:0;">Rangkuman semua syntax yang dipelajari di Bab 2. Simpan/print buat ditempel di meja belajar.</p>
+      </div>
+      <button class="btn accent" id="btnPrintCs">🖨️ Print / Simpan PDF</button>
+    </div>
+
+    <div class="cs-print-title">Cheat Sheet Python — Koding &amp; AI Bab 2 · SMP Negeri 9 Samarinda</div>
+
+    <div class="cs-grid">
+      <div class="cs-card">
+        <h3>Nested If</h3>
+        <pre class="cs-code">if syarat1:
+    if syarat2:
+        # dijalankan kalau
+        # syarat1 DAN syarat2
+        # sama-sama benar
+        ...</pre>
+      </div>
+
+      <div class="cs-card">
+        <h3>Comparison Chaining</h3>
+        <pre class="cs-code">if 80 <= nilai <= 90:
+    print("di rentang!")
+
+# sama dengan:
+if nilai >= 80 and nilai <= 90:
+    ...</pre>
+      </div>
+
+      <div class="cs-card">
+        <h3>Nested Loop</h3>
+        <pre class="cs-code">for i in range(3):
+    for j in range(2):
+        print(i, j)
+# luar jalan 1x -> dalam
+# jalan penuh dulu</pre>
+      </div>
+
+      <div class="cs-card">
+        <h3>Metode List</h3>
+        <pre class="cs-code">data = []
+data.append(x)   # tambah di akhir
+data.sort()       # urutkan
+data.pop(0)       # ambil & hapus depan
+data.pop()        # ambil & hapus akhir
+data.remove(x)    # hapus berdasar isi</pre>
+      </div>
+
+      <div class="cs-card">
+        <h3>Fungsi (def &amp; return)</h3>
+        <pre class="cs-code">def nama_fungsi(param):
+    hasil = param * 2
+    return hasil
+
+x = nama_fungsi(5)  # x = 10</pre>
+      </div>
+
+      <div class="cs-card">
+        <h3>FIFO (Antrean)</h3>
+        <pre class="cs-code">antrean = []
+antrean.append("A")
+antrean.append("B")
+depan = antrean.pop(0)
+# depan = "A" (masuk duluan,
+# keluar duluan)</pre>
+      </div>
+
+      <div class="cs-card">
+        <h3>Algoritma Greedy (Kembalian)</h3>
+        <pre class="cs-code">pecahan = [20000, 10000, 5000]
+hasil = []
+for p in pecahan:
+    while kembalian >= p:
+        hasil.append(p)
+        kembalian -= p</pre>
+      </div>
+
+      <div class="cs-card">
+        <h3>try-except</h3>
+        <pre class="cs-code">try:
+    x = int(input("Angka: "))
+    print(100 / x)
+except:
+    print("Input tidak valid!")</pre>
+      </div>
+
+      <div class="cs-card cs-wide">
+        <h3>3 Jenis Bug</h3>
+        <table class="cs-table">
+          <tr><th>Jenis</th><th>Ciri-ciri</th><th>Contoh</th></tr>
+          <tr><td><strong>Syntax Error</strong></td><td>Program tidak bisa jalan sama sekali</td><td>Lupa tanda titik dua <code>:</code></td></tr>
+          <tr><td><strong>Runtime Error</strong></td><td>Program berhenti di tengah jalan</td><td>Membagi dengan 0</td></tr>
+          <tr><td><strong>Logic Error</strong></td><td>Jalan lancar, tapi hasil salah</td><td>Rumus salah ditulis</td></tr>
+        </table>
+      </div>
+
+      <div class="cs-card">
+        <h3>Operator Perbandingan</h3>
+        <pre class="cs-code">==   sama dengan
+!=   tidak sama dengan
+>    lebih besar
+<    lebih kecil
+>=   lebih besar sama dengan
+<=   lebih kecil sama dengan</pre>
+      </div>
+
+      <div class="cs-card">
+        <h3>Operator Logika</h3>
+        <pre class="cs-code">and   # kedua syarat harus benar
+or    # salah satu syarat benar
+not   # membalik nilai benar/salah</pre>
+      </div>
+    </div>
+
+    <div class="cs-footer-note no-print">
+      <a href="materi.html" class="btn ghost">← Kembali ke Materi</a>
+      <a href="flashcard.html" class="btn ghost">🗂️ Latihan Flashcard →</a>
+    </div>
+  </div>
+</section>
+
+<footer class="no-print">E-Modul Koding dan Artifisial Intelijen · Bab 2 · SMP Negeri 9 Samarinda</footer>
+<button class="back-top no-print" aria-label="Kembali ke atas">↑</button>
+
+<script src="../js/main.js"></script>
+<script>
+  document.getElementById('btnPrintCs').addEventListener('click', () => window.print());
+</script>
+</body>
+</html>

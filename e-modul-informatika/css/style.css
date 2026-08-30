@@ -143,6 +143,16 @@ p{margin:0 0 1em 0;}
 .accordion-body h4{font-size:14px; color:var(--primary); margin:20px 0 6px 0; text-transform:uppercase; letter-spacing:.04em;}
 .accordion-body h4:first-child{margin-top:6px;}
 
+/* Text-to-Speech button */
+.tts-btn{
+  display:inline-flex; align-items:center; gap:6px; background:var(--surface); border:1.5px solid var(--primary);
+  color:var(--primary); border-radius:20px; padding:7px 15px; font-size:13px; font-weight:600; cursor:pointer;
+  margin-bottom:14px;
+}
+.tts-btn:hover{background:rgba(51,85,217,.08);}
+.tts-btn.tts-playing{background:var(--primary); color:#fff; animation:ttsPulse 1.4s ease-in-out infinite;}
+@keyframes ttsPulse{0%,100%{box-shadow:0 0 0 0 rgba(51,85,217,.35);} 50%{box-shadow:0 0 0 6px rgba(51,85,217,0);}}
+
 /* Code blocks */
 pre.code{
   background:#0f1621; color:#dbe6f3; padding:16px 18px; border-radius:9px; overflow-x:auto;
