@@ -40,9 +40,9 @@ LANGKAH 3 — Pasang Aturan Keamanan Firestore
 ⚠️ PENTING kalau kamu sebelumnya sudah pernah menempel Rules versi
 lama: buka lagi Firebase Console > Firestore Database > tab "Rules",
 HAPUS SEMUA isinya, lalu tempel ulang versi TERBARU di bawah ini
-(sudah termasuk aturan untuk fitur Kumpul Tugas Koding), klik
-"Publish" lagi. Kalau tidak diulang, fitur Kumpul Tugas akan gagal
-dengan pesan "Akses ditolak sistem".
+(sudah termasuk aturan untuk fitur Kumpul Tugas Koding, Absensi, dan
+Nilai Manual), klik "Publish" lagi. Kalau tidak diulang, fitur-fitur
+baru akan gagal dengan pesan "Akses ditolak sistem".
 
 Buka Firebase Console > Firestore Database > tab "Rules", hapus
 semua isinya, lalu tempel aturan di bawah ini, klik "Publish":
@@ -104,6 +104,14 @@ service cloud.firestore {
       );
       allow delete: if isAdmin();
     }
+
+    match /absensi/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    match /nilaiManual/{id} {
+      allow read, write: if isAdmin();
+    }
   }
 }
 --------------------------------------------------------------
@@ -112,6 +120,11 @@ Aturan "submissions" di atas sengaja dibuat supaya siswa BOLEH kirim/
 ubah kode tugasnya sendiri, tapi TIDAK BISA mengubah nilai/catatan
 yang sudah diisi guru (field nilai, catatanGuru, dinilai hanya bisa
 diubah lewat akun admin).
+
+Aturan "absensi" dan "nilaiManual" sengaja dibuat HANYA BISA diakses
+admin — datanya bersifat administratif (rekap kehadiran dan nilai
+resmi), jadi siswa tidak diberi akses baca/tulis ke koleksi ini sama
+sekali lewat sistem online.
 
 Kenapa ini penting: karena aturan versi awal (kalau hanya menebak
 "bukan email siswa = admin") bisa dibobol siapa saja yang tahu cara

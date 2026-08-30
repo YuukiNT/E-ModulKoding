@@ -49,6 +49,8 @@
       <button data-tab="soal">📝 Soal</button>
       <button data-tab="tugas">📤 Tugas Koding</button>
       <button data-tab="siswa">🧑‍🎓 Siswa</button>
+      <button data-tab="absensi">📋 Absensi</button>
+      <button data-tab="nilaimanual">✍️ Nilai Manual</button>
       <button data-tab="nilai">📊 Nilai</button>
     </div>
 
@@ -237,6 +239,64 @@
       </div>
     </div>
 
+    <!-- TAB: ABSENSI -->
+    <div class="admin-panel" id="tabAbsensi">
+      <div class="on-panel-card">
+        <h3>Input Absensi</h3>
+        <div style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:14px;">
+          <div class="on-field" style="max-width:260px; margin-bottom:0;">
+            <label>Pertemuan</label>
+            <select id="absensiPertemuan">
+              <option value="p1">Pertemuan 1</option>
+              <option value="p2">Pertemuan 2</option>
+              <option value="p3">Pertemuan 3</option>
+            </select>
+          </div>
+          <div class="on-field" style="max-width:200px; margin-bottom:0;">
+            <label>Filter Kelas</label>
+            <select id="absensiKelasFilter"><option value="semua">Semua Kelas</option></select>
+          </div>
+        </div>
+        <table class="on-table">
+          <thead><tr><th>No</th><th>Nama</th><th>Kelas</th><th>Status</th></tr></thead>
+          <tbody id="absensiInputBody"></tbody>
+        </table>
+        <button class="on-btn accent" id="btnSimpanAbsensi" style="width:auto; padding:11px 22px; margin-top:14px;">💾 Simpan Absensi Pertemuan Ini</button>
+      </div>
+
+      <div class="on-panel-card">
+        <h3>📊 Rekap Kehadiran (Semua Pertemuan)</h3>
+        <button class="on-btn secondary sm" id="btnExportAbsensi" style="width:auto; margin-bottom:14px;">⬇ Unduh Rekap (CSV)</button>
+        <table class="on-table">
+          <thead><tr><th>Nama</th><th>Kelas</th><th>P1</th><th>P2</th><th>P3</th><th>Total Hadir</th></tr></thead>
+          <tbody id="absensiRekapBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB: NILAI MANUAL -->
+    <div class="admin-panel" id="tabNilaimanual">
+      <div class="on-panel-card">
+        <h3>Input Nilai (sesuai rubrik Modul Ajar)</h3>
+        <p style="color:var(--on-ink-soft); font-size:13.5px; margin-top:-8px;">Nilai LKPD tiap pertemuan (0-100), Skor PG (maks 20), Skor Uraian (maks 20), dan Sikap (skala 1-4). Nilai Akhir dihitung otomatis: (Skor PG + Skor Uraian) / 40 × 100.</p>
+        <div class="on-field" style="max-width:200px;">
+          <label>Filter Kelas</label>
+          <select id="nilaiManualKelasFilter"><option value="semua">Semua Kelas</option></select>
+        </div>
+        <div style="overflow-x:auto;">
+        <table class="on-table" id="nilaiManualTable">
+          <thead><tr>
+            <th>Nama</th><th>LKPD P1</th><th>LKPD P2</th><th>LKPD P3</th>
+            <th>PG (/20)</th><th>Uraian (/20)</th><th>Sikap (1-4)</th><th>Nilai Akhir</th>
+          </tr></thead>
+          <tbody id="nilaiManualBody"></tbody>
+        </table>
+        </div>
+        <button class="on-btn accent" id="btnSimpanNilaiManual" style="width:auto; padding:11px 22px; margin-top:14px;">💾 Simpan Semua Nilai</button>
+        <button class="on-btn secondary sm" id="btnExportNilaiManual" style="width:auto; margin-top:14px;">⬇ Unduh Rekap (CSV)</button>
+      </div>
+    </div>
+
     <!-- TAB: NILAI -->
     <div class="admin-panel" id="tabNilai">
       <div class="on-panel-card">
@@ -360,6 +420,8 @@
     renderNilaiTable();
     renderNgainTable();
     renderTugasTable();
+    initAbsensiTab();
+    initNilaiManualTab();
     document.getElementById('filterSoalPertemuan').addEventListener('change', renderSoalTable);
     document.getElementById('filterNilaiPertemuan').addEventListener('change', renderNilaiTable);
     document.getElementById('filterTugas').addEventListener('change', renderTugasTable);
@@ -602,6 +664,230 @@
     }
   }
 
+  /* ===== helper bersama: ambil semua siswa & isi dropdown filter kelas ===== */
+  let allStudentsCache = [];
+  async function loadAllStudents(){
+    if(allStudentsCache.length > 0) return allStudentsCache;
+    const snaps = await getDocs(collection(db, 'students'));
+    allStudentsCache = [];
+    snaps.forEach(s => allStudentsCache.push({ nisn: s.id, ...s.data() }));
+    allStudentsCache.sort((a,b) => (a.nama||'').localeCompare(b.nama||''));
+    return allStudentsCache;
+  }
+  function populateKelasFilter(selectEl, students){
+    const kelasSet = [...new Set(students.map(s => s.kelas).filter(Boolean))].sort();
+    const current = selectEl.value;
+    selectEl.innerHTML = '<option value="semua">Semua Kelas</option>' +
+      kelasSet.map(k => `<option value="${k}">${k}</option>`).join('');
+    if(kelasSet.includes(current)) selectEl.value = current;
+  }
+
+  /* ===== TAB ABSENSI ===== */
+  const ABSENSI_STATUS = ['Hadir', 'Sakit', 'Izin', 'Alpa'];
+
+  async function initAbsensiTab(){
+    const students = await loadAllStudents();
+    populateKelasFilter(document.getElementById('absensiKelasFilter'), students);
+    await renderAbsensiInput();
+    await renderAbsensiRekap();
+  }
+
+  async function renderAbsensiInput(){
+    const students = await loadAllStudents();
+    const kelasFilter = document.getElementById('absensiKelasFilter').value;
+    const pertemuan = document.getElementById('absensiPertemuan').value;
+    const filtered = kelasFilter === 'semua' ? students : students.filter(s => s.kelas === kelasFilter);
+
+    // Ambil status absensi yang sudah tersimpan untuk pertemuan ini
+    let existingMap = {};
+    try{
+      const snaps = await getDocs(query(collection(db, 'absensi'), where('pertemuan', '==', pertemuan)));
+      snaps.forEach(s => { existingMap[s.data().nisn] = s.data().status; });
+    }catch(err){ /* biarkan default Hadir kalau gagal baca */ }
+
+    const tbody = document.getElementById('absensiInputBody');
+    tbody.innerHTML = filtered.map((s, i) => `
+      <tr>
+        <td>${i+1}</td>
+        <td>${escapeHtml(s.nama)}</td>
+        <td>${escapeHtml(s.kelas||'')}</td>
+        <td>
+          <select class="absensi-status-select" data-nisn="${s.nisn}" data-nama="${escapeHtml(s.nama)}" data-kelas="${escapeHtml(s.kelas||'')}">
+            ${ABSENSI_STATUS.map(st => `<option value="${st}" ${(existingMap[s.nisn]||'Hadir')===st?'selected':''}>${st}</option>`).join('')}
+          </select>
+        </td>
+      </tr>
+    `).join('');
+    if(filtered.length === 0){
+      tbody.innerHTML = '<tr><td colspan="4" style="color:var(--on-ink-soft); text-align:center;">Belum ada siswa di kelas ini.</td></tr>';
+    }
+  }
+
+  document.getElementById('absensiPertemuan').addEventListener('change', renderAbsensiInput);
+  document.getElementById('absensiKelasFilter').addEventListener('change', renderAbsensiInput);
+
+  document.getElementById('btnSimpanAbsensi').addEventListener('click', async () => {
+    const pertemuan = document.getElementById('absensiPertemuan').value;
+    const rows = [...document.querySelectorAll('.absensi-status-select')];
+    if(rows.length === 0) return;
+    const btn = document.getElementById('btnSimpanAbsensi');
+    btn.disabled = true; btn.textContent = 'Menyimpan...';
+    try{
+      for(const sel of rows){
+        const nisn = sel.dataset.nisn;
+        await setDoc(doc(db, 'absensi', nisn + '_' + pertemuan), {
+          nisn, nama: sel.dataset.nama, kelas: sel.dataset.kelas,
+          pertemuan, status: sel.value, waktu: serverTimestamp()
+        });
+      }
+      showToast('✅ Absensi tersimpan!');
+      renderAbsensiRekap();
+    }catch(err){
+      showToast(friendlyError(err));
+    }
+    btn.disabled = false; btn.textContent = '💾 Simpan Absensi Pertemuan Ini';
+  });
+
+  let absensiRekapCache = [];
+  async function renderAbsensiRekap(){
+    const students = await loadAllStudents();
+    const tbody = document.getElementById('absensiRekapBody');
+    let allSnaps;
+    try{
+      allSnaps = await getDocs(collection(db, 'absensi'));
+    }catch(err){
+      tbody.innerHTML = `<tr><td colspan="6" style="color:var(--on-danger); text-align:center;">${friendlyError(err)}</td></tr>`;
+      return;
+    }
+    const byNisn = {};
+    allSnaps.forEach(s => {
+      const d = s.data();
+      if(!byNisn[d.nisn]) byNisn[d.nisn] = {};
+      byNisn[d.nisn][d.pertemuan] = d.status;
+    });
+
+    absensiRekapCache = students.map(s => {
+      const rec = byNisn[s.nisn] || {};
+      const totalHadir = ['p1','p2','p3'].filter(p => rec[p] === 'Hadir').length;
+      return { nisn: s.nisn, nama: s.nama, kelas: s.kelas||'', p1: rec.p1||'-', p2: rec.p2||'-', p3: rec.p3||'-', totalHadir };
+    });
+
+    tbody.innerHTML = absensiRekapCache.map(r => `
+      <tr><td>${escapeHtml(r.nama)}</td><td>${escapeHtml(r.kelas)}</td><td>${r.p1}</td><td>${r.p2}</td><td>${r.p3}</td><td>${r.totalHadir}/3</td></tr>
+    `).join('');
+    if(absensiRekapCache.length === 0){
+      tbody.innerHTML = '<tr><td colspan="6" style="color:var(--on-ink-soft); text-align:center;">Belum ada data absensi.</td></tr>';
+    }
+  }
+
+  document.getElementById('btnExportAbsensi').addEventListener('click', () => {
+    if(absensiRekapCache.length === 0){ showToast('Tidak ada data untuk diunduh.'); return; }
+    let csv = 'Nama,Kelas,Pertemuan 1,Pertemuan 2,Pertemuan 3,Total Hadir\n';
+    absensiRekapCache.forEach(r => { csv += `"${r.nama}",${r.kelas},${r.p1},${r.p2},${r.p3},${r.totalHadir}/3\n`; });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'rekap-absensi-koding-ai.csv'; a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  /* ===== TAB NILAI MANUAL ===== */
+  async function initNilaiManualTab(){
+    const students = await loadAllStudents();
+    populateKelasFilter(document.getElementById('nilaiManualKelasFilter'), students);
+    await renderNilaiManualTable();
+  }
+
+  function hitungNilaiAkhirManual(pg, uraian){
+    if(pg === '' && uraian === '') return null;
+    const pgN = parseFloat(pg) || 0, urN = parseFloat(uraian) || 0;
+    return Math.round(((pgN + urN) / 40) * 100);
+  }
+
+  async function renderNilaiManualTable(){
+    const students = await loadAllStudents();
+    const kelasFilter = document.getElementById('nilaiManualKelasFilter').value;
+    const filtered = kelasFilter === 'semua' ? students : students.filter(s => s.kelas === kelasFilter);
+
+    let existingMap = {};
+    try{
+      const snaps = await getDocs(collection(db, 'nilaiManual'));
+      snaps.forEach(s => { existingMap[s.id] = s.data(); });
+    }catch(err){ /* biarkan kosong kalau gagal baca */ }
+
+    const tbody = document.getElementById('nilaiManualBody');
+    tbody.innerHTML = filtered.map(s => {
+      const d = existingMap[s.nisn] || {};
+      const akhir = hitungNilaiAkhirManual(d.pg ?? '', d.uraian ?? '');
+      return `
+        <tr data-nisn="${s.nisn}" data-nama="${escapeHtml(s.nama)}" data-kelas="${escapeHtml(s.kelas||'')}">
+          <td>${escapeHtml(s.nama)}</td>
+          <td><input type="number" min="0" max="100" class="nm-input" data-field="lkpd1" value="${d.lkpd1 ?? ''}" style="width:64px;"></td>
+          <td><input type="number" min="0" max="100" class="nm-input" data-field="lkpd2" value="${d.lkpd2 ?? ''}" style="width:64px;"></td>
+          <td><input type="number" min="0" max="100" class="nm-input" data-field="lkpd3" value="${d.lkpd3 ?? ''}" style="width:64px;"></td>
+          <td><input type="number" min="0" max="20" class="nm-input nm-pg" data-field="pg" value="${d.pg ?? ''}" style="width:56px;"></td>
+          <td><input type="number" min="0" max="20" class="nm-input nm-uraian" data-field="uraian" value="${d.uraian ?? ''}" style="width:56px;"></td>
+          <td><input type="number" min="1" max="4" step="0.1" class="nm-input" data-field="sikap" value="${d.sikap ?? ''}" style="width:56px;"></td>
+          <td class="nm-akhir" style="font-weight:700;">${akhir ?? '-'}</td>
+        </tr>`;
+    }).join('');
+    if(filtered.length === 0){
+      tbody.innerHTML = '<tr><td colspan="8" style="color:var(--on-ink-soft); text-align:center;">Belum ada siswa di kelas ini.</td></tr>';
+    }
+
+    tbody.querySelectorAll('tr').forEach(tr => {
+      tr.querySelectorAll('.nm-pg, .nm-uraian').forEach(inp => {
+        inp.addEventListener('input', () => {
+          const pg = tr.querySelector('.nm-pg').value;
+          const uraian = tr.querySelector('.nm-uraian').value;
+          tr.querySelector('.nm-akhir').textContent = hitungNilaiAkhirManual(pg, uraian) ?? '-';
+        });
+      });
+    });
+  }
+
+  document.getElementById('nilaiManualKelasFilter').addEventListener('change', renderNilaiManualTable);
+
+  document.getElementById('btnSimpanNilaiManual').addEventListener('click', async () => {
+    const rows = [...document.querySelectorAll('#nilaiManualBody tr[data-nisn]')];
+    if(rows.length === 0) return;
+    const btn = document.getElementById('btnSimpanNilaiManual');
+    btn.disabled = true; btn.textContent = 'Menyimpan...';
+    try{
+      for(const tr of rows){
+        const nisn = tr.dataset.nisn;
+        const getVal = (field) => {
+          const v = tr.querySelector(`[data-field="${field}"]`).value;
+          return v === '' ? null : parseFloat(v);
+        };
+        const pg = getVal('pg'), uraian = getVal('uraian');
+        await setDoc(doc(db, 'nilaiManual', nisn), {
+          nisn, nama: tr.dataset.nama, kelas: tr.dataset.kelas,
+          lkpd1: getVal('lkpd1'), lkpd2: getVal('lkpd2'), lkpd3: getVal('lkpd3'),
+          pg, uraian, sikap: getVal('sikap'),
+          nilaiAkhir: hitungNilaiAkhirManual(pg ?? '', uraian ?? '')
+        });
+      }
+      showToast('✅ Semua nilai tersimpan!');
+    }catch(err){
+      showToast(friendlyError(err));
+    }
+    btn.disabled = false; btn.textContent = '💾 Simpan Semua Nilai';
+  });
+
+  document.getElementById('btnExportNilaiManual').addEventListener('click', () => {
+    const rows = [...document.querySelectorAll('#nilaiManualBody tr[data-nisn]')];
+    if(rows.length === 0){ showToast('Tidak ada data untuk diunduh.'); return; }
+    let csv = 'Nama,Kelas,LKPD P1,LKPD P2,LKPD P3,PG,Uraian,Sikap,Nilai Akhir\n';
+    rows.forEach(tr => {
+      const getVal = (field) => tr.querySelector(`[data-field="${field}"]`).value || '';
+      csv += `"${tr.dataset.nama}",${tr.dataset.kelas},${getVal('lkpd1')},${getVal('lkpd2')},${getVal('lkpd3')},${getVal('pg')},${getVal('uraian')},${getVal('sikap')},${tr.querySelector('.nm-akhir').textContent}\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'rekap-nilai-manual-koding-ai.csv'; a.click();
+    URL.revokeObjectURL(url);
+  });
+
   /* ===== TAB SISWA: import Excel ===== */
   document.getElementById('btnDownloadTemplateSiswa').addEventListener('click', () => {
     const headers = ['NISN', 'Nama', 'Kelas', 'Password Awal'];
@@ -709,7 +995,10 @@
     parsedSiswaRows = [];
     document.getElementById('excelSiswaInput').value = '';
     btn.disabled = false; btn.textContent = '✅ Buat Akun untuk Baris yang Valid';
+    allStudentsCache = []; // paksa muat ulang daftar siswa di tab Absensi & Nilai Manual
     renderSiswaTable();
+    initAbsensiTab();
+    initNilaiManualTab();
   });
 
   /* ===== TAB SISWA: tambah satu per satu ===== */
@@ -742,7 +1031,10 @@
       document.getElementById('siswaPassword').value = '';
       document.getElementById('siswaSuccess').classList.add('show');
       setTimeout(() => document.getElementById('siswaSuccess').classList.remove('show'), 2000);
+      allStudentsCache = []; // paksa muat ulang daftar siswa di tab Absensi & Nilai Manual
       renderSiswaTable();
+      initAbsensiTab();
+      initNilaiManualTab();
     }catch(err){
       let pesan = 'Gagal membuat akun.';
       if(err.code === 'auth/email-already-in-use') pesan = 'NISN ini sudah terdaftar.';
