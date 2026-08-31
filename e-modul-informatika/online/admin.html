@@ -233,7 +233,7 @@
       <div class="on-panel-card">
         <h3>Daftar Siswa</h3>
         <table class="on-table">
-          <thead><tr><th>NISN</th><th>Nama</th><th>Kelas</th></tr></thead>
+          <thead><tr><th>NISN</th><th>Nama</th><th>Kelas</th><th>Aksi</th></tr></thead>
           <tbody id="siswaTableBody"></tbody>
         </table>
       </div>
@@ -950,17 +950,27 @@
       const rec = byNisn[s.nisn] || {};
       const totalHadir = sesiListCache.filter(sesi => rec[sesi.id] === 'Hadir').length;
       return {
-        nisn: s.nisn, nama: s.nama, kelas: s.kelas||'',
+        nisn: s.nisn, nama: s.nama, kelas: s.kelas||'(Tanpa Kelas)',
         statusPerSesi: sesiListCache.map(sesi => rec[sesi.id] || '-'),
         totalHadir
       };
     });
+    // Urutkan per kelas dulu, baru per nama — supaya gampang dikelompokkan saat ditampilkan.
+    absensiRekapCache.sort((a,b) => a.kelas.localeCompare(b.kelas) || a.nama.localeCompare(b.nama));
 
-    tbody.innerHTML = absensiRekapCache.map(r => `
-      <tr><td>${escapeHtml(r.nama)}</td><td>${escapeHtml(r.kelas)}</td>${r.statusPerSesi.map(st => `<td>${renderStatusChip(st)}</td>`).join('')}<td><strong>${r.totalHadir}/${sesiListCache.length}</strong></td></tr>
-    `).join('');
+    const totalKolom = sesiListCache.length + 3;
+    let html = '';
+    let kelasSebelumnya = null;
+    absensiRekapCache.forEach(r => {
+      if(r.kelas !== kelasSebelumnya){
+        kelasSebelumnya = r.kelas;
+        html += `<tr class="absen-kelas-divider"><td colspan="${totalKolom}">🏫 Kelas ${escapeHtml(r.kelas)}</td></tr>`;
+      }
+      html += `<tr><td>${escapeHtml(r.nama)}</td><td>${escapeHtml(r.kelas)}</td>${r.statusPerSesi.map(st => `<td>${renderStatusChip(st)}</td>`).join('')}<td><strong>${r.totalHadir}/${sesiListCache.length}</strong></td></tr>`;
+    });
+    tbody.innerHTML = html;
     if(absensiRekapCache.length === 0){
-      tbody.innerHTML = `<tr><td colspan="${sesiListCache.length + 3}" style="color:var(--on-ink-soft); text-align:center;">Belum ada data absensi.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="${totalKolom}" style="color:var(--on-ink-soft); text-align:center;">Belum ada data absensi.</td></tr>`;
     }
   }
 
@@ -1369,18 +1379,75 @@
     try{
       snaps = await getDocs(collection(db, 'students'));
     }catch(err){
-      tbody.innerHTML = `<tr><td colspan="3" style="color:var(--on-danger); text-align:center;">${friendlyError(err)}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="4" style="color:var(--on-danger); text-align:center;">${friendlyError(err)}</td></tr>`;
       return;
     }
+    const list = [];
+    snaps.forEach(s => list.push({ nisn: s.id, ...s.data() }));
+    list.sort((a,b) => (a.kelas||'').localeCompare(b.kelas||'') || (a.nama||'').localeCompare(b.nama||''));
+
     tbody.innerHTML = '';
-    snaps.forEach(s => {
-      const d = s.data();
+    list.forEach(d => {
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${escapeHtml(s.id)}</td><td>${escapeHtml(d.nama||'')}</td><td>${escapeHtml(d.kelas||'')}</td>`;
+      tr.dataset.nisn = d.nisn;
+      renderSiswaRowView(tr, d);
       tbody.appendChild(tr);
     });
-    if(snaps.size === 0){
-      tbody.innerHTML = '<tr><td colspan="3" style="color:var(--on-ink-soft); text-align:center;">Belum ada siswa terdaftar.</td></tr>';
+    if(list.length === 0){
+      tbody.innerHTML = '<tr><td colspan="4" style="color:var(--on-ink-soft); text-align:center;">Belum ada siswa terdaftar.</td></tr>';
+    }
+  }
+
+  function renderSiswaRowView(tr, d){
+    tr.innerHTML = `
+      <td>${escapeHtml(d.nisn)}</td>
+      <td>${escapeHtml(d.nama||'')}</td>
+      <td>${escapeHtml(d.kelas||'')}</td>
+      <td>
+        <button class="mini-btn" data-edit-siswa="${d.nisn}">Edit</button>
+        <button class="mini-btn danger" data-hapus-siswa="${d.nisn}">Hapus</button>
+      </td>`;
+    tr.querySelector('[data-edit-siswa]').addEventListener('click', () => renderSiswaRowEdit(tr, d));
+    tr.querySelector('[data-hapus-siswa]').addEventListener('click', () => hapusSiswa(d));
+  }
+
+  function renderSiswaRowEdit(tr, d){
+    tr.innerHTML = `
+      <td>${escapeHtml(d.nisn)}</td>
+      <td><input type="text" class="nm-input" style="width:100%;" id="editNama_${d.nisn}" value="${escapeHtml(d.nama||'')}"></td>
+      <td><input type="text" class="nm-input" style="width:90px;" id="editKelas_${d.nisn}" value="${escapeHtml(d.kelas||'')}"></td>
+      <td>
+        <button class="mini-btn" data-simpan-edit="${d.nisn}">💾 Simpan</button>
+        <button class="mini-btn" data-batal-edit="${d.nisn}">Batal</button>
+      </td>`;
+    tr.querySelector('[data-simpan-edit]').addEventListener('click', async () => {
+      const namaBaru = document.getElementById('editNama_' + d.nisn).value.trim();
+      const kelasBaru = document.getElementById('editKelas_' + d.nisn).value.trim();
+      if(!namaBaru){ showToast('Nama tidak boleh kosong.'); return; }
+      try{
+        await updateDoc(doc(db, 'students', d.nisn), { nama: namaBaru, kelas: kelasBaru });
+        allStudentsCache = []; // paksa muat ulang di tab Absensi & Nilai Manual juga
+        showToast('✅ Data siswa diperbarui!');
+        d.nama = namaBaru; d.kelas = kelasBaru;
+        renderSiswaRowView(tr, d);
+      }catch(err){
+        showToast(friendlyError(err));
+      }
+    });
+    tr.querySelector('[data-batal-edit]').addEventListener('click', () => renderSiswaRowView(tr, d));
+  }
+
+  async function hapusSiswa(d){
+    if(!confirm(`Hapus data siswa "${d.nama}" (NISN ${d.nisn})?\n\nCatatan: ini menghapus datanya dari sistem (siswa jadi tidak bisa lagi login/masuk kuis). Akun login di Firebase Authentication tidak otomatis terhapus — kalau mau bersih total, hapus manual juga lewat Firebase Console > Authentication > cari email ${d.nisn}@siswa.emodul.local.`)) return;
+    try{
+      await deleteDoc(doc(db, 'students', d.nisn));
+      allStudentsCache = [];
+      showToast('🗑️ Data siswa dihapus.');
+      renderSiswaTable();
+      initAbsensiTab();
+      initNilaiManualTab();
+    }catch(err){
+      showToast(friendlyError(err));
     }
   }
 
