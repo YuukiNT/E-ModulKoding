@@ -355,7 +355,7 @@
             <option value="posttest">Posttest</option>
           </select>
         </div>
-        <button class="on-btn secondary sm" id="btnExportCsv" style="width:auto; margin-bottom:14px;">⬇ Unduh sebagai CSV</button>
+        <button class="on-btn secondary sm" id="btnExportCsv" style="width:auto; margin-bottom:14px;">⬇ Unduh Excel</button>
         <table class="on-table">
           <thead><tr><th>NISN</th><th>Nama</th><th>Kelas</th><th>Pertemuan</th><th>Benar</th><th>Nilai</th></tr></thead>
           <tbody id="nilaiTableBody"></tbody>
@@ -365,7 +365,7 @@
       <div class="on-panel-card">
         <h3>📈 Rekap N-Gain (Pretest → Posttest)</h3>
         <p style="color:var(--on-ink-soft); font-size:13.5px; margin-top:-8px;">Dihitung otomatis dari nilai Pretest dan Posttest tiap siswa. Rumus: (Posttest − Pretest) / (100 − Pretest).</p>
-        <button class="on-btn secondary sm" id="btnExportNgainCsv" style="width:auto; margin-bottom:14px;">⬇ Unduh Rekap N-Gain (CSV)</button>
+        <button class="on-btn secondary sm" id="btnExportNgainCsv" style="width:auto; margin-bottom:14px;">⬇ Unduh Rekap N-Gain (Excel)</button>
         <table class="on-table">
           <thead><tr><th>NISN</th><th>Nama</th><th>Kelas</th><th>Pretest</th><th>Posttest</th><th>N-Gain</th><th>Kategori</th></tr></thead>
           <tbody id="ngainTableBody"></tbody>
@@ -382,7 +382,7 @@
   import {
     auth, db, secondaryAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut,
     createUserWithEmailAndPassword, STUDENT_EMAIL_DOMAIN, persistenceReady,
-    collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, query, where, orderBy
+    collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp
   } from "./js/firebase-init.js";
 
   function showToast(msg){
@@ -966,14 +966,9 @@
 
   document.getElementById('btnExportAbsensi').addEventListener('click', () => {
     if(absensiRekapCache.length === 0){ showToast('Tidak ada data untuk diunduh.'); return; }
-    let csv = 'Nama,Kelas,' + sesiListCache.map(s => s.nama).join(',') + ',Total Hadir\n';
-    absensiRekapCache.forEach(r => {
-      csv += `"${r.nama}",${r.kelas},${r.statusPerSesi.join(',')},${r.totalHadir}/${sesiListCache.length}\n`;
-    });
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'rekap-absensi-koding-ai.csv'; a.click();
-    URL.revokeObjectURL(url);
+    const headers = ['Nama', 'Kelas', ...sesiListCache.map(s => s.nama), 'Total Hadir'];
+    const rows = absensiRekapCache.map(r => [r.nama, r.kelas, ...r.statusPerSesi, `${r.totalHadir}/${sesiListCache.length}`]);
+    exportToExcel('rekap-absensi-koding-ai.xlsx', 'Absensi', headers, rows);
   });
 
   /* ===== TAB NILAI MANUAL ===== */
@@ -1077,15 +1072,12 @@
   document.getElementById('btnExportNilaiManual').addEventListener('click', () => {
     const rows = [...document.querySelectorAll('#nilaiManualBody tr[data-nisn]')];
     if(rows.length === 0){ showToast('Tidak ada data untuk diunduh.'); return; }
-    let csv = 'Nama,Kelas,LKPD P1,LKPD P2,LKPD P3,PG,Uraian,Sikap,Nilai Akhir\n';
-    rows.forEach(tr => {
+    const headers = ['Nama', 'Kelas', 'LKPD P1', 'LKPD P2', 'LKPD P3', 'PG', 'Uraian', 'Sikap', 'Nilai Akhir'];
+    const dataRows = rows.map(tr => {
       const getVal = (field) => tr.querySelector(`[data-field="${field}"]`).value || '';
-      csv += `"${tr.dataset.nama}",${tr.dataset.kelas},${getVal('lkpd1')},${getVal('lkpd2')},${getVal('lkpd3')},${getVal('pg')},${getVal('uraian')},${getVal('sikap')},${tr.querySelector('.nm-akhir').textContent}\n`;
+      return [tr.dataset.nama, tr.dataset.kelas, getVal('lkpd1'), getVal('lkpd2'), getVal('lkpd3'), getVal('pg'), getVal('uraian'), getVal('sikap'), tr.querySelector('.nm-akhir').textContent];
     });
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'rekap-nilai-manual-koding-ai.csv'; a.click();
-    URL.revokeObjectURL(url);
+    exportToExcel('rekap-nilai-manual-koding-ai.xlsx', 'Nilai Manual', headers, dataRows);
   });
 
   /* ===== TAB SISWA: import Excel ===== */
@@ -1427,16 +1419,9 @@
   document.getElementById('btnExportCsv').addEventListener('click', () => {
     if(allScoresCache.length === 0){ showToast('Tidak ada data untuk diunduh.'); return; }
     const pertLabel = PERTEMUAN_LABEL;
-    let csv = 'NISN,Nama,Kelas,Pertemuan,Benar,Total,Nilai\n';
-    allScoresCache.forEach(d => {
-      csv += `${d.nisn},"${d.nama}",${d.kelas||''},${pertLabel[d.pertemuan]||d.pertemuan},${d.benar},${d.total},${d.persen}\n`;
-    });
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'nilai-koding-ai-bab2.csv';
-    a.click();
-    URL.revokeObjectURL(url);
+    const headers = ['NISN', 'Nama', 'Kelas', 'Pertemuan', 'Benar', 'Total', 'Nilai'];
+    const rows = allScoresCache.map(d => [d.nisn, d.nama, d.kelas||'', pertLabel[d.pertemuan]||d.pertemuan, d.benar, d.total, d.persen]);
+    exportToExcel('nilai-koding-ai-bab2.xlsx', 'Nilai', headers, rows);
   });
 
   /* ===== N-GAIN (Pretest vs Posttest) ===== */
@@ -1512,17 +1497,23 @@
 
   document.getElementById('btnExportNgainCsv').addEventListener('click', () => {
     if(ngainCache.length === 0){ showToast('Tidak ada data untuk diunduh.'); return; }
-    let csv = 'NISN,Nama,Kelas,Pretest,Posttest,N-Gain,Kategori\n';
-    ngainCache.forEach(d => {
-      csv += `${d.nisn},"${d.nama}",${d.kelas},${d.pretest ?? ''},${d.posttest ?? ''},${d.gain !== null ? d.gain.toFixed(2) : ''},${kategoriGain(d.gain)}\n`;
-    });
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'rekap-ngain-koding-ai-bab2.csv';
-    a.click();
-    URL.revokeObjectURL(url);
+    const headers = ['NISN', 'Nama', 'Kelas', 'Pretest', 'Posttest', 'N-Gain', 'Kategori'];
+    const rows = ngainCache.map(d => [d.nisn, d.nama, d.kelas, d.pretest ?? '', d.posttest ?? '', d.gain !== null ? d.gain.toFixed(2) : '', kategoriGain(d.gain)]);
+    exportToExcel('rekap-ngain-koding-ai-bab2.xlsx', 'N-Gain', headers, rows);
   });
+
+  /* Helper: unduh data sebagai file Excel (.xlsx) asli — lebih rapi daripada CSV
+     karena tidak tergantung pengaturan pemisah kolom regional di Excel pengguna. */
+  function exportToExcel(filename, sheetName, headers, rows){
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    ws['!cols'] = headers.map((h, i) => {
+      const maxLen = Math.max(String(h).length, ...rows.map(r => String(r[i] ?? '').length));
+      return { wch: Math.min(Math.max(maxLen + 2, 10), 40) };
+    });
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    XLSX.writeFile(wb, filename);
+  }
 
   function escapeHtml(s){
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
