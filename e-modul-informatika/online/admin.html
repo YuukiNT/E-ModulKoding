@@ -242,58 +242,101 @@
     <!-- TAB: ABSENSI -->
     <div class="admin-panel" id="tabAbsensi">
       <div class="on-panel-card">
-        <h3>Input Absensi</h3>
-        <div style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:14px;">
-          <div class="on-field" style="max-width:260px; margin-bottom:0;">
-            <label>Pertemuan</label>
-            <select id="absensiPertemuan">
-              <option value="p1">Pertemuan 1</option>
-              <option value="p2">Pertemuan 2</option>
-              <option value="p3">Pertemuan 3</option>
-            </select>
+        <div class="step-label"><span class="num">1</span> Kelola Sesi Pertemuan</div>
+        <p style="color:var(--on-ink-soft); font-size:13.5px; margin-top:-2px;">Tambah sesi sebanyak yang kamu butuhkan — tidak dibatasi 3 pertemuan, cocok dipakai untuk semua pertemuan sepanjang semester.</p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
+          <div class="on-field" style="max-width:240px; margin-bottom:0;">
+            <label>Nama Sesi</label>
+            <input type="text" id="sesiNamaInput" placeholder="Contoh: Pertemuan 4">
+          </div>
+          <div class="on-field" style="max-width:180px; margin-bottom:0;">
+            <label>Tanggal (opsional)</label>
+            <input type="date" id="sesiTanggalInput">
+          </div>
+          <button class="on-btn accent" id="btnTambahSesi" style="width:auto; padding:10px 20px;">➕ Tambah Sesi</button>
+        </div>
+        <div id="sesiListWrap" style="margin-top:16px;"></div>
+      </div>
+
+      <div class="on-panel-card">
+        <div class="step-label"><span class="num">2</span> Tandai Kehadiran</div>
+        <div style="display:flex; gap:14px; flex-wrap:wrap; margin:10px 0 4px 0;">
+          <div class="on-field" style="max-width:280px; margin-bottom:0;">
+            <label>Sesi yang diisi</label>
+            <select id="absensiSesi"><option value="">— belum ada sesi, tambah dulu di atas —</option></select>
           </div>
           <div class="on-field" style="max-width:200px; margin-bottom:0;">
             <label>Filter Kelas</label>
             <select id="absensiKelasFilter"><option value="semua">Semua Kelas</option></select>
           </div>
+          <div style="margin-bottom:0;">
+            <label style="display:block; font-size:13px; font-weight:600; margin-bottom:5px; color:var(--on-ink-soft);">&nbsp;</label>
+            <button class="on-btn secondary sm" id="btnTandaiSemuaHadir" style="width:auto;">✅ Tandai Semua Hadir</button>
+          </div>
         </div>
+
+        <div class="absen-summary" id="absenSummary"></div>
+
         <table class="on-table">
-          <thead><tr><th>No</th><th>Nama</th><th>Kelas</th><th>Status</th></tr></thead>
+          <thead><tr><th style="width:36px;">No</th><th>Nama</th><th>Kelas</th><th>Status Kehadiran</th></tr></thead>
           <tbody id="absensiInputBody"></tbody>
         </table>
-        <button class="on-btn accent" id="btnSimpanAbsensi" style="width:auto; padding:11px 22px; margin-top:14px;">💾 Simpan Absensi Pertemuan Ini</button>
+        <button class="on-btn accent" id="btnSimpanAbsensi" style="width:auto; padding:11px 22px; margin-top:14px;">💾 Simpan Absensi Sesi Ini</button>
       </div>
 
       <div class="on-panel-card">
-        <h3>📊 Rekap Kehadiran (Semua Pertemuan)</h3>
-        <button class="on-btn secondary sm" id="btnExportAbsensi" style="width:auto; margin-bottom:14px;">⬇ Unduh Rekap (CSV)</button>
-        <table class="on-table">
-          <thead><tr><th>Nama</th><th>Kelas</th><th>P1</th><th>P2</th><th>P3</th><th>Total Hadir</th></tr></thead>
+        <div class="step-label"><span class="num">3</span> Rekap Kehadiran (Semua Sesi)</div>
+        <button class="on-btn secondary sm" id="btnExportAbsensi" style="width:auto; margin:10px 0 14px 0;">⬇ Unduh Rekap (CSV)</button>
+        <div style="overflow-x:auto;">
+        <table class="on-table" id="absensiRekapTable">
+          <thead><tr id="absensiRekapHead"><th>Nama</th><th>Kelas</th><th>Total Hadir</th></tr></thead>
           <tbody id="absensiRekapBody"></tbody>
         </table>
+        </div>
       </div>
     </div>
 
     <!-- TAB: NILAI MANUAL -->
     <div class="admin-panel" id="tabNilaimanual">
       <div class="on-panel-card">
-        <h3>Input Nilai (sesuai rubrik Modul Ajar)</h3>
-        <p style="color:var(--on-ink-soft); font-size:13.5px; margin-top:-8px;">Nilai LKPD tiap pertemuan (0-100), Skor PG (maks 20), Skor Uraian (maks 20), dan Sikap (skala 1-4). Nilai Akhir dihitung otomatis: (Skor PG + Skor Uraian) / 40 × 100.</p>
-        <div class="on-field" style="max-width:200px;">
-          <label>Filter Kelas</label>
-          <select id="nilaiManualKelasFilter"><option value="semua">Semua Kelas</option></select>
+        <h3>✍️ Input Nilai (sesuai rubrik Modul Ajar)</h3>
+        <p style="color:var(--on-ink-soft); font-size:13.5px; margin-top:-8px;">Isi kolom yang berwarna. Nilai Akhir (kolom terakhir) dihitung otomatis dari PG + Uraian, langsung berubah warna hijau (Tuntas ≥75) atau merah (Belum Tuntas) saat kamu mengetik.</p>
+
+        <div class="nm-legend">
+          <span><span class="box" style="background:#f4f7ff;"></span> Formatif — LKPD tiap pertemuan (0-100)</span>
+          <span><span class="box" style="background:#fff8ef;"></span> Sumatif — PG &amp; Uraian (sesuai skor maksimal modul)</span>
+          <span><span class="box" style="background:#f4fbf6;"></span> Sikap — skala 1-4</span>
         </div>
-        <div style="overflow-x:auto;">
-        <table class="on-table" id="nilaiManualTable">
-          <thead><tr>
-            <th>Nama</th><th>LKPD P1</th><th>LKPD P2</th><th>LKPD P3</th>
-            <th>PG (/20)</th><th>Uraian (/20)</th><th>Sikap (1-4)</th><th>Nilai Akhir</th>
-          </tr></thead>
+
+        <div style="display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; margin-bottom:14px;">
+          <div class="on-field nm-search" style="margin-bottom:0;">
+            <label>Cari Nama</label>
+            <input type="text" id="nilaiManualSearch" placeholder="Ketik nama siswa...">
+          </div>
+          <div class="on-field" style="max-width:200px; margin-bottom:0;">
+            <label>Filter Kelas</label>
+            <select id="nilaiManualKelasFilter"><option value="semua">Semua Kelas</option></select>
+          </div>
+        </div>
+
+        <div class="nm-table-wrap">
+        <table class="nm-table" id="nilaiManualTable">
+          <thead>
+            <tr class="nm-group-row">
+              <th></th><th colspan="3">📘 Nilai Formatif (LKPD)</th><th colspan="2">📄 Nilai Sumatif</th><th>🤝 Sikap</th><th>🏁 Hasil</th>
+            </tr>
+            <tr>
+              <th>Nama</th><th>P1</th><th>P2</th><th>P3</th>
+              <th>PG /20</th><th>Uraian /20</th><th>1-4</th><th>Nilai Akhir</th>
+            </tr>
+          </thead>
           <tbody id="nilaiManualBody"></tbody>
         </table>
         </div>
-        <button class="on-btn accent" id="btnSimpanNilaiManual" style="width:auto; padding:11px 22px; margin-top:14px;">💾 Simpan Semua Nilai</button>
-        <button class="on-btn secondary sm" id="btnExportNilaiManual" style="width:auto; margin-top:14px;">⬇ Unduh Rekap (CSV)</button>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;">
+          <button class="on-btn accent" id="btnSimpanNilaiManual" style="width:auto; padding:11px 22px;">💾 Simpan Semua Nilai</button>
+          <button class="on-btn secondary sm" id="btnExportNilaiManual" style="width:auto;">⬇ Unduh Rekap (CSV)</button>
+        </div>
       </div>
     </div>
 
@@ -682,62 +725,192 @@
     if(kelasSet.includes(current)) selectEl.value = current;
   }
 
-  /* ===== TAB ABSENSI ===== */
+  /* ===== TAB ABSENSI (sesi dinamis, tidak dibatasi jumlahnya) ===== */
   const ABSENSI_STATUS = ['Hadir', 'Sakit', 'Izin', 'Alpa'];
+  let sesiListCache = [];
+
+  async function loadSesiList(){
+    let snaps;
+    try{
+      snaps = await getDocs(query(collection(db, 'sesiAbsensi'), orderBy('urutan')));
+    }catch(err){
+      showToast(friendlyError(err));
+      return [];
+    }
+    sesiListCache = [];
+    snaps.forEach(s => sesiListCache.push({ id: s.id, ...s.data() }));
+    return sesiListCache;
+  }
+
+  function renderSesiDropdown(){
+    const sel = document.getElementById('absensiSesi');
+    const current = sel.value;
+    if(sesiListCache.length === 0){
+      sel.innerHTML = '<option value="">— belum ada sesi, tambah dulu di atas —</option>';
+      return;
+    }
+    sel.innerHTML = sesiListCache.map(s => `<option value="${s.id}">${escapeHtml(s.nama)}${s.tanggal ? ' — ' + s.tanggal : ''}</option>`).join('');
+    if(sesiListCache.some(s => s.id === current)) sel.value = current;
+  }
+
+  function renderSesiList(){
+    const wrap = document.getElementById('sesiListWrap');
+    if(sesiListCache.length === 0){
+      wrap.innerHTML = '<p style="color:var(--on-ink-soft); font-size:13.5px;">Belum ada sesi. Tambahkan sesi pertama di atas.</p>';
+      return;
+    }
+    wrap.innerHTML = '<table class="on-table"><thead><tr><th>Sesi</th><th>Tanggal</th><th></th></tr></thead><tbody>' +
+      sesiListCache.map(s => `
+        <tr>
+          <td>${escapeHtml(s.nama)}</td>
+          <td>${s.tanggal || '-'}</td>
+          <td><button class="mini-btn danger" data-hapus-sesi="${s.id}">Hapus</button></td>
+        </tr>`).join('') +
+      '</tbody></table>';
+    wrap.querySelectorAll('[data-hapus-sesi]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if(!confirm('Hapus sesi ini? Data absensi yang sudah tercatat untuk sesi ini akan tetap ada di database, tapi tidak akan muncul lagi di daftar sesi.')) return;
+        try{
+          await deleteDoc(doc(db, 'sesiAbsensi', btn.dataset.hapusSesi));
+          await loadSesiList();
+          renderSesiDropdown();
+          renderSesiList();
+          renderAbsensiInput();
+          renderAbsensiRekap();
+        }catch(err){ showToast(friendlyError(err)); }
+      });
+    });
+  }
+
+  document.getElementById('btnTambahSesi').addEventListener('click', async () => {
+    const nama = document.getElementById('sesiNamaInput').value.trim();
+    const tanggal = document.getElementById('sesiTanggalInput').value;
+    if(!nama){ showToast('Isi nama sesinya dulu.'); return; }
+    const btn = document.getElementById('btnTambahSesi');
+    btn.disabled = true;
+    try{
+      await addDoc(collection(db, 'sesiAbsensi'), { nama, tanggal: tanggal || null, urutan: sesiListCache.length + 1 });
+      document.getElementById('sesiNamaInput').value = '';
+      document.getElementById('sesiTanggalInput').value = '';
+      await loadSesiList();
+      renderSesiDropdown();
+      renderSesiList();
+      renderAbsensiInput();
+      renderAbsensiRekap();
+      showToast('✅ Sesi ditambahkan!');
+    }catch(err){
+      showToast(friendlyError(err));
+    }
+    btn.disabled = false;
+  });
 
   async function initAbsensiTab(){
     const students = await loadAllStudents();
     populateKelasFilter(document.getElementById('absensiKelasFilter'), students);
+    await loadSesiList();
+    renderSesiDropdown();
+    renderSesiList();
     await renderAbsensiInput();
     await renderAbsensiRekap();
+  }
+
+  const ABSENSI_ICON = { Hadir:'✅', Sakit:'🤒', Izin:'📋', Alpa:'❌' };
+  function renderStatusChip(status){
+    if(status === '-') return '<span class="status-chip st-none">—</span>';
+    const cls = { Hadir:'st-hadir', Sakit:'st-sakit', Izin:'st-izin', Alpa:'st-alpa' }[status] || 'st-none';
+    return `<span class="status-chip ${cls}">${ABSENSI_ICON[status]||''} ${status}</span>`;
   }
 
   async function renderAbsensiInput(){
     const students = await loadAllStudents();
     const kelasFilter = document.getElementById('absensiKelasFilter').value;
-    const pertemuan = document.getElementById('absensiPertemuan').value;
+    const sesiId = document.getElementById('absensiSesi').value;
     const filtered = kelasFilter === 'semua' ? students : students.filter(s => s.kelas === kelasFilter);
+    const tbody = document.getElementById('absensiInputBody');
 
-    // Ambil status absensi yang sudah tersimpan untuk pertemuan ini
+    if(!sesiId){
+      tbody.innerHTML = '<tr><td colspan="4" style="color:var(--on-ink-soft); text-align:center;">Tambahkan/pilih sesi dulu di atas.</td></tr>';
+      document.getElementById('absenSummary').innerHTML = '';
+      return;
+    }
+
     let existingMap = {};
     try{
-      const snaps = await getDocs(query(collection(db, 'absensi'), where('pertemuan', '==', pertemuan)));
+      const snaps = await getDocs(query(collection(db, 'absensi'), where('sesiId', '==', sesiId)));
       snaps.forEach(s => { existingMap[s.data().nisn] = s.data().status; });
     }catch(err){ /* biarkan default Hadir kalau gagal baca */ }
 
-    const tbody = document.getElementById('absensiInputBody');
-    tbody.innerHTML = filtered.map((s, i) => `
-      <tr>
+    tbody.innerHTML = filtered.map((s, i) => {
+      const current = existingMap[s.nisn] || 'Hadir';
+      return `
+      <tr data-nisn-row="${s.nisn}">
         <td>${i+1}</td>
         <td>${escapeHtml(s.nama)}</td>
         <td>${escapeHtml(s.kelas||'')}</td>
         <td>
-          <select class="absensi-status-select" data-nisn="${s.nisn}" data-nama="${escapeHtml(s.nama)}" data-kelas="${escapeHtml(s.kelas||'')}">
-            ${ABSENSI_STATUS.map(st => `<option value="${st}" ${(existingMap[s.nisn]||'Hadir')===st?'selected':''}>${st}</option>`).join('')}
-          </select>
+          <div class="absen-pill-row" data-nisn="${s.nisn}" data-nama="${escapeHtml(s.nama)}" data-kelas="${escapeHtml(s.kelas||'')}" data-current="${current}">
+            ${ABSENSI_STATUS.map(st => `<button type="button" class="absen-pill sel-${st.toLowerCase()} ${current===st?'active':''}" data-status="${st}">${ABSENSI_ICON[st]} ${st}</button>`).join('')}
+          </div>
         </td>
-      </tr>
-    `).join('');
+      </tr>`;
+    }).join('');
     if(filtered.length === 0){
       tbody.innerHTML = '<tr><td colspan="4" style="color:var(--on-ink-soft); text-align:center;">Belum ada siswa di kelas ini.</td></tr>';
     }
+
+    tbody.querySelectorAll('.absen-pill-row').forEach(row => {
+      row.querySelectorAll('.absen-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          row.querySelectorAll('.absen-pill').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          row.dataset.current = btn.dataset.status;
+          updateAbsenSummary();
+        });
+      });
+    });
+    updateAbsenSummary();
   }
 
-  document.getElementById('absensiPertemuan').addEventListener('change', renderAbsensiInput);
+  function updateAbsenSummary(){
+    const rows = [...document.querySelectorAll('.absen-pill-row')];
+    const counts = { Hadir:0, Sakit:0, Izin:0, Alpa:0 };
+    rows.forEach(r => { counts[r.dataset.current] = (counts[r.dataset.current]||0) + 1; });
+    document.getElementById('absenSummary').innerHTML = `
+      <span><span class="absen-dot dot-hadir"></span> Hadir: ${counts.Hadir}</span>
+      <span><span class="absen-dot dot-sakit"></span> Sakit: ${counts.Sakit}</span>
+      <span><span class="absen-dot dot-izin"></span> Izin: ${counts.Izin}</span>
+      <span><span class="absen-dot dot-alpa"></span> Alpa: ${counts.Alpa}</span>
+      <span style="color:var(--on-ink-soft); font-weight:400;">dari ${rows.length} siswa</span>
+    `;
+  }
+
+  document.getElementById('btnTandaiSemuaHadir').addEventListener('click', () => {
+    document.querySelectorAll('.absen-pill-row').forEach(row => {
+      row.dataset.current = 'Hadir';
+      row.querySelectorAll('.absen-pill').forEach(b => b.classList.toggle('active', b.dataset.status === 'Hadir'));
+    });
+    updateAbsenSummary();
+    showToast('Semua ditandai Hadir — tinggal ubah yang perlu.');
+  });
+
+  document.getElementById('absensiSesi').addEventListener('change', renderAbsensiInput);
   document.getElementById('absensiKelasFilter').addEventListener('change', renderAbsensiInput);
 
   document.getElementById('btnSimpanAbsensi').addEventListener('click', async () => {
-    const pertemuan = document.getElementById('absensiPertemuan').value;
-    const rows = [...document.querySelectorAll('.absensi-status-select')];
+    const sesiId = document.getElementById('absensiSesi').value;
+    if(!sesiId){ showToast('Pilih sesi dulu.'); return; }
+    const sesiInfo = sesiListCache.find(s => s.id === sesiId);
+    const rows = [...document.querySelectorAll('.absen-pill-row')];
     if(rows.length === 0) return;
     const btn = document.getElementById('btnSimpanAbsensi');
     btn.disabled = true; btn.textContent = 'Menyimpan...';
     try{
-      for(const sel of rows){
-        const nisn = sel.dataset.nisn;
-        await setDoc(doc(db, 'absensi', nisn + '_' + pertemuan), {
-          nisn, nama: sel.dataset.nama, kelas: sel.dataset.kelas,
-          pertemuan, status: sel.value, waktu: serverTimestamp()
+      for(const row of rows){
+        const nisn = row.dataset.nisn;
+        await setDoc(doc(db, 'absensi', nisn + '_' + sesiId), {
+          nisn, nama: row.dataset.nama, kelas: row.dataset.kelas,
+          sesiId, sesiNama: sesiInfo ? sesiInfo.nama : sesiId,
+          status: row.dataset.current, waktu: serverTimestamp()
         });
       }
       showToast('✅ Absensi tersimpan!');
@@ -745,45 +918,58 @@
     }catch(err){
       showToast(friendlyError(err));
     }
-    btn.disabled = false; btn.textContent = '💾 Simpan Absensi Pertemuan Ini';
+    btn.disabled = false; btn.textContent = '💾 Simpan Absensi Sesi Ini';
   });
 
   let absensiRekapCache = [];
   async function renderAbsensiRekap(){
     const students = await loadAllStudents();
+    const theadRow = document.getElementById('absensiRekapHead');
     const tbody = document.getElementById('absensiRekapBody');
+
+    // Bangun header tabel secara dinamis: satu kolom per sesi yang ada.
+    theadRow.innerHTML = '<th>Nama</th><th>Kelas</th>' +
+      sesiListCache.map(s => `<th>${escapeHtml(s.nama)}</th>`).join('') +
+      '<th>Total Hadir</th>';
+
     let allSnaps;
     try{
       allSnaps = await getDocs(collection(db, 'absensi'));
     }catch(err){
-      tbody.innerHTML = `<tr><td colspan="6" style="color:var(--on-danger); text-align:center;">${friendlyError(err)}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="${sesiListCache.length + 3}" style="color:var(--on-danger); text-align:center;">${friendlyError(err)}</td></tr>`;
       return;
     }
     const byNisn = {};
     allSnaps.forEach(s => {
       const d = s.data();
       if(!byNisn[d.nisn]) byNisn[d.nisn] = {};
-      byNisn[d.nisn][d.pertemuan] = d.status;
+      byNisn[d.nisn][d.sesiId] = d.status;
     });
 
     absensiRekapCache = students.map(s => {
       const rec = byNisn[s.nisn] || {};
-      const totalHadir = ['p1','p2','p3'].filter(p => rec[p] === 'Hadir').length;
-      return { nisn: s.nisn, nama: s.nama, kelas: s.kelas||'', p1: rec.p1||'-', p2: rec.p2||'-', p3: rec.p3||'-', totalHadir };
+      const totalHadir = sesiListCache.filter(sesi => rec[sesi.id] === 'Hadir').length;
+      return {
+        nisn: s.nisn, nama: s.nama, kelas: s.kelas||'',
+        statusPerSesi: sesiListCache.map(sesi => rec[sesi.id] || '-'),
+        totalHadir
+      };
     });
 
     tbody.innerHTML = absensiRekapCache.map(r => `
-      <tr><td>${escapeHtml(r.nama)}</td><td>${escapeHtml(r.kelas)}</td><td>${r.p1}</td><td>${r.p2}</td><td>${r.p3}</td><td>${r.totalHadir}/3</td></tr>
+      <tr><td>${escapeHtml(r.nama)}</td><td>${escapeHtml(r.kelas)}</td>${r.statusPerSesi.map(st => `<td>${renderStatusChip(st)}</td>`).join('')}<td><strong>${r.totalHadir}/${sesiListCache.length}</strong></td></tr>
     `).join('');
     if(absensiRekapCache.length === 0){
-      tbody.innerHTML = '<tr><td colspan="6" style="color:var(--on-ink-soft); text-align:center;">Belum ada data absensi.</td></tr>';
+      tbody.innerHTML = `<tr><td colspan="${sesiListCache.length + 3}" style="color:var(--on-ink-soft); text-align:center;">Belum ada data absensi.</td></tr>`;
     }
   }
 
   document.getElementById('btnExportAbsensi').addEventListener('click', () => {
     if(absensiRekapCache.length === 0){ showToast('Tidak ada data untuk diunduh.'); return; }
-    let csv = 'Nama,Kelas,Pertemuan 1,Pertemuan 2,Pertemuan 3,Total Hadir\n';
-    absensiRekapCache.forEach(r => { csv += `"${r.nama}",${r.kelas},${r.p1},${r.p2},${r.p3},${r.totalHadir}/3\n`; });
+    let csv = 'Nama,Kelas,' + sesiListCache.map(s => s.nama).join(',') + ',Total Hadir\n';
+    absensiRekapCache.forEach(r => {
+      csv += `"${r.nama}",${r.kelas},${r.statusPerSesi.join(',')},${r.totalHadir}/${sesiListCache.length}\n`;
+    });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href = url; a.download = 'rekap-absensi-koding-ai.csv'; a.click();
@@ -803,10 +989,17 @@
     return Math.round(((pgN + urN) / 40) * 100);
   }
 
+  function nilaiAkhirClass(akhir){
+    if(akhir === null || akhir === undefined) return 'kosong';
+    return akhir >= 75 ? 'tuntas' : 'belum';
+  }
+
   async function renderNilaiManualTable(){
     const students = await loadAllStudents();
     const kelasFilter = document.getElementById('nilaiManualKelasFilter').value;
-    const filtered = kelasFilter === 'semua' ? students : students.filter(s => s.kelas === kelasFilter);
+    const searchTerm = document.getElementById('nilaiManualSearch').value.trim().toLowerCase();
+    let filtered = kelasFilter === 'semua' ? students : students.filter(s => s.kelas === kelasFilter);
+    if(searchTerm) filtered = filtered.filter(s => s.nama.toLowerCase().includes(searchTerm));
 
     let existingMap = {};
     try{
@@ -821,13 +1014,13 @@
       return `
         <tr data-nisn="${s.nisn}" data-nama="${escapeHtml(s.nama)}" data-kelas="${escapeHtml(s.kelas||'')}">
           <td>${escapeHtml(s.nama)}</td>
-          <td><input type="number" min="0" max="100" class="nm-input" data-field="lkpd1" value="${d.lkpd1 ?? ''}" style="width:64px;"></td>
-          <td><input type="number" min="0" max="100" class="nm-input" data-field="lkpd2" value="${d.lkpd2 ?? ''}" style="width:64px;"></td>
-          <td><input type="number" min="0" max="100" class="nm-input" data-field="lkpd3" value="${d.lkpd3 ?? ''}" style="width:64px;"></td>
-          <td><input type="number" min="0" max="20" class="nm-input nm-pg" data-field="pg" value="${d.pg ?? ''}" style="width:56px;"></td>
-          <td><input type="number" min="0" max="20" class="nm-input nm-uraian" data-field="uraian" value="${d.uraian ?? ''}" style="width:56px;"></td>
-          <td><input type="number" min="1" max="4" step="0.1" class="nm-input" data-field="sikap" value="${d.sikap ?? ''}" style="width:56px;"></td>
-          <td class="nm-akhir" style="font-weight:700;">${akhir ?? '-'}</td>
+          <td class="nm-group-formatif"><input type="number" min="0" max="100" class="nm-input" data-field="lkpd1" value="${d.lkpd1 ?? ''}" placeholder="-"></td>
+          <td class="nm-group-formatif"><input type="number" min="0" max="100" class="nm-input" data-field="lkpd2" value="${d.lkpd2 ?? ''}" placeholder="-"></td>
+          <td class="nm-group-formatif"><input type="number" min="0" max="100" class="nm-input" data-field="lkpd3" value="${d.lkpd3 ?? ''}" placeholder="-"></td>
+          <td class="nm-group-sumatif"><input type="number" min="0" max="20" class="nm-input nm-pg" data-field="pg" value="${d.pg ?? ''}" placeholder="-"></td>
+          <td class="nm-group-sumatif"><input type="number" min="0" max="20" class="nm-input nm-uraian" data-field="uraian" value="${d.uraian ?? ''}" placeholder="-"></td>
+          <td class="nm-group-sikap"><input type="number" min="1" max="4" step="0.1" class="nm-input" data-field="sikap" value="${d.sikap ?? ''}" placeholder="-"></td>
+          <td><span class="nm-akhir nm-akhir-cell ${nilaiAkhirClass(akhir)}">${akhir ?? '-'}</span></td>
         </tr>`;
     }).join('');
     if(filtered.length === 0){
@@ -839,13 +1032,20 @@
         inp.addEventListener('input', () => {
           const pg = tr.querySelector('.nm-pg').value;
           const uraian = tr.querySelector('.nm-uraian').value;
-          tr.querySelector('.nm-akhir').textContent = hitungNilaiAkhirManual(pg, uraian) ?? '-';
+          const akhir = hitungNilaiAkhirManual(pg, uraian);
+          const cell = tr.querySelector('.nm-akhir');
+          cell.textContent = akhir ?? '-';
+          cell.className = 'nm-akhir nm-akhir-cell ' + nilaiAkhirClass(akhir);
         });
       });
     });
   }
 
   document.getElementById('nilaiManualKelasFilter').addEventListener('change', renderNilaiManualTable);
+  document.getElementById('nilaiManualSearch').addEventListener('input', () => {
+    clearTimeout(window._nmSearchTimer);
+    window._nmSearchTimer = setTimeout(renderNilaiManualTable, 250);
+  });
 
   document.getElementById('btnSimpanNilaiManual').addEventListener('click', async () => {
     const rows = [...document.querySelectorAll('#nilaiManualBody tr[data-nisn]')];

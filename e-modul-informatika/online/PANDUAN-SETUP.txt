@@ -109,6 +109,10 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    match /sesiAbsensi/{id} {
+      allow read, write: if isAdmin();
+    }
+
     match /nilaiManual/{id} {
       allow read, write: if isAdmin();
     }
